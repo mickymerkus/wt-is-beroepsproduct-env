@@ -1,4 +1,4 @@
-FROM php:8.1-cli-alpine3.15
+FROM php:8.3-cli-alpine
 
 WORKDIR /tmp/
 
@@ -6,7 +6,6 @@ WORKDIR /tmp/
 #    https://docs.microsoft.com/en-us/sql/connect/php/installation-tutorial-linux-mac?view=sql-server-ver15#step-1-install-php-alpine
 
 RUN apk update
-RUN apk add --no-cache php8 php8-dev php8-pear php8-pdo php8-openssl 
 RUN apk add --no-cache autoconf make g++ gnupg unixodbc-dev
 RUN apk add --no-cache linux-headers
 
