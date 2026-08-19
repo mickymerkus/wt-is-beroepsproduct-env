@@ -1,3 +1,27 @@
+<?php 
+    require_once __DIR__ . '/categorieen.php';
+
+    $db = maakVerbinding();
+
+    $categorieen = haalProductTypes($db)
+
+    $gevraagd = $_GET['categorie'] ?? 0;
+
+    // Afscherming van de parameter, default staat op pizza
+    $categorie = in_array($gevraagd, $categorieen, true) ? $gevraagd : 'Pizza';
+
+    // ophalen van de data
+    $producten = haalProductenMetIngredienten($db, $categorie);
+
+    
+?>
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -8,16 +32,14 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="home">
-    <header>
-
-    </header>
-    <div class="banner"><img class="banner-img" src="./images/banner.png" alt="een getekend plaatje met een pizza-oven en een italiaans landschap in zonnige kleuren."></div>
-    <nav class="product-tabs">
+    <?php include 'presentatie/gedeeld/header.php'; ?>
+    <?php include 'presentatie/gedeeld/header_banner.php'; ?>
+        <nav class="product-tabs">
         <ul>
-            <li><a href="?category=Pizza">Pizza</a></li>
-            <li><a href="?category=Voorgerecht">Voorgerecht</a></li>
-            <li><a href="?category=Maaltijd">Maaltijd</a></li>
-            <li><a href="?category=Drank">Drank</a></li>
+            <li><a href="?categorie=Pizza">Pizza</a></li>
+            <li><a href="?categorie=Voorgerecht">Voorgerecht</a></li>
+            <li><a href="?categorie=Maaltijd">Maaltijd</a></li>
+            <li><a href="?categorie=Drank">Drank</a></li>
         </ul>
     </nav>
     <main>
@@ -91,7 +113,7 @@
             </ul>
             <footer>
                 <p class="totaal">Totaal: €x.xx</p>
-                <form action="bevestig_bestelling.html" method="post">
+                <form action="bevestig_bestelling.php" method="post">
                     <button type="submit">Bestellen</button>
                 </form>
                 
@@ -99,8 +121,6 @@
 
         </aside>
     </main>
-    <footer>
-
-    </footer>
+    <?php include 'presentatie/gedeeld/footer.php'; ?>
 </body>
 </html>

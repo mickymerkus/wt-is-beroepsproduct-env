@@ -9,9 +9,9 @@
 </head>
 <body>
     <header>
-        <a href="bestellingsoverzicht_bezorger.html"><img class="header-logo" src="./images/header-logo.png" alt="pizzeria logo en link naar bezorger-overzicht"></a>
-        <a class="rol-wissel" href="bestellingsoverzicht_personeel.html">Bekijk keuken-overzicht</a>
-        <a class="logout-knop" href="login.html">Uitloggen</a>
+        <a href="bestellingsoverzicht_bezorger.php"><img class="header-logo" src="./images/header-logo.png" alt="pizzeria logo en link naar bezorger-overzicht"></a>
+        <a class="rol-wissel" href="bestellingsoverzicht_personeel.php">Bekijk keuken-overzicht</a>
+        <a class="logout-knop" href="login.php">Uitloggen</a>
     </header>
     <main class="column-card-container">
         <article class="bestelling-card">

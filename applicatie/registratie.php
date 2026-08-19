@@ -15,8 +15,8 @@
     <div class="banner"><img class="banner-img" src="./images/banner.png" alt="een getekend plaatje met een pizza-oven en een italiaans landschap in zonnige kleuren."></div>
     <main>
         <section class="formulier">
-            <a href="index.html">Terug naar Homepage.</a>
-            <form action="index.html" method="post">
+            <a href="index.php">Terug naar Homepage.</a>
+            <form action="index.php" method="post">
                 
                 <fieldset class="formulier-sectie">
                     <legend>Accountgegevens</legend>

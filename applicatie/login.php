@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-        <a href="index.html"><img class="header-logo"  src="./images/header-logo.png" alt="pizzeria logo en link naar homepage"></a> 
+        <a href="index.php"><img class="header-logo"  src="./images/header-logo.png" alt="pizzeria logo en link naar homepage"></a> 
         Pizzeria Sole Machina
 
     </header>
@@ -28,11 +28,11 @@
                 </div>
                 <button type="submit">Inloggen</button>
             </form>
-            <a href="registratie.html">Account aanmaken</a>
+            <a href="registratie.php">Account aanmaken</a>
         </section>
     </main>
     <footer>
-        <a href="privacy.html">Privacy Statement</a>
+        <a href="privacy.php">Privacy Statement</a>
     </footer>
 </body>
 </html>

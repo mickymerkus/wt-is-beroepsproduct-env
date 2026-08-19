@@ -16,6 +16,8 @@ unset($db_password);
 
 // Zorg ervoor dat eventuele fouttoestanden ook echt als fouten (exceptions) gesignaleerd worden door PHP.
 $verbinding->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Vastgezet zodat we niet elke keer beide soorten arrays terugkrijgen
+$verbinding->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
 // Functie om in andere files toegang te krijgen tot de verbinding.
 function maakVerbinding() {
