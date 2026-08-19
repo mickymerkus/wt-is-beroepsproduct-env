@@ -38,6 +38,7 @@ $table = $table . '<table>';
 <body>
   <h1>Alle producten op een rijtje</h1>
   <!-- 3. Weergeven van de data -->
+   
   <?= $table ?>
 </body>
 </html>
