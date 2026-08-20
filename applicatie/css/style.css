@@ -128,6 +128,9 @@ input[type="text"] {
     gap: 0.3rem;
 }
 
+.actief {
+    font-weight: bold;
+}
 
 /* Login pagina */
 .login-page {

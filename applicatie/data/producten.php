@@ -3,23 +3,25 @@
 require_once __DIR__ . '/db_connectie.php';
 
 // Haal producten op van een bepaalde categorie (pizza, drank etc.)
-function haalProductenMetIngredienten($verbinding, $type_id = null) {
+function haalProductenMetIngredienten($verbinding, $categorie) {
     $sql = '
-        SELECT p.name, p.price, p.type_id, pi.ingredient_name
+        SELECT p.name, p.price, pi.ingredient_name
         FROM Product p
         LEFT JOIN Product_Ingredient pi ON pi.product_name = p.name
-        WHERE p.type_id = :type_id
+        WHERE p.type_id = :categorie
         ORDER BY p.name, pi.ingredient_name
     ';
 
     $query = $verbinding->prepare($sql);
-    $query->execute([':type_id' => $type_id]);
+    $query->execute([':categorie' => $categorie]);
     $data = $query->fetchAll();
     return _groepeerOpProduct($data);
 }
 
 //Zorg dat de ingredienten bij elk product komen te staan als list in een array
 function _groepeerOpProduct(array $rijen) {
+    $producten = [];
+
     foreach ($rijen as $rij) {
         $naam = $rij[$name];
 
@@ -35,9 +37,8 @@ function _groepeerOpProduct(array $rijen) {
         if ($rij['ingredient_name' !== null]) {
             $gegroepeerd[$naam]['ingredienten'][] = $rij['ingredient_name']
         }
-
-
     }
+    return array_values($producten);
 }
 
 

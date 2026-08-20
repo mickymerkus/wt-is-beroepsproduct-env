@@ -3,7 +3,7 @@
 
     $db = maakVerbinding();
 
-    $categorieen = haalProductTypes($db)
+    $categorieen = haalProductTypes($db);
 
     $gevraagd = $_GET['categorie'] ?? 0;
 
