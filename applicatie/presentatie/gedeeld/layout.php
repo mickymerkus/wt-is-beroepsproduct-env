@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Standaard waarde voor de titel als er geen paginatitel is. -->
-    <title><?= htmlspecialchars($paginaTitel ?? 'Pizzeria Sole Machina')?>></title>
+    <title><?= htmlspecialchars($paginaTitel ?? 'Pizzeria Sole Machina')?></title>
     <link rel="icon" type="image/png" href="./images/icon.png">
     <link rel="stylesheet" href="css/style.css">
 </head>

@@ -20,7 +20,8 @@ $verbinding->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $verbinding->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
 // Functie om in andere files toegang te krijgen tot de verbinding.
-function maakVerbinding() {
+function maakVerbinding(): PDO 
+{
   global $verbinding;
   return $verbinding;
 }

@@ -3,7 +3,7 @@
 require_once __DIR__ . '/db_connectie.php';
 
 // Haal alle legitieme categorieën op
-function haalProductTypes($verbinding) {
+function haalProductTypes($verbinding): array {
     $sql = '
         SELECT name
         FROM ProductType

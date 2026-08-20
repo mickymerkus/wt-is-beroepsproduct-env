@@ -1,3 +1,37 @@
+<?php
+    require_once __DIR__ . '/data/db_connectie.php';
+    require_once __DIR__ . '/logica/sessie.php';
+    require_once __DIR__ . '/logica/winkelmandje.php';
+
+    startSessie();
+
+    $db = maakVerbinding();
+
+    // De klant mag op deze pagina ook nog het winkelmandje aanpassen
+    if (verwerkWinkelmandjeActie($db, $_POST)) {
+        header('Location: bevestig_bestelling.php');
+    }
+
+    $winkelmandjeRegels = haalWinkelmandjeRegels($db);
+    $winkelmandjeTotaal = berekenTotaal($winkelmandjeRegels);
+    $aantalInMandje = aantalArtikelenInmandje();
+
+    // Config
+    $paginaTitel = 'Bevestig bestelling';
+    $bodyKlasse = 'bevestig-bestelling';
+    $toonBanner = true;
+    $toonBestelknop = false;
+    $winkelmandjeActie = 'bevestig_bestelling.php';
+    $categorie = ''; // geen categorietabs op deze pagina
+    $inhoud = __DIR__ . '/presentatie/bestelformulier.php';
+
+    include __DIR__ . '/presentatie/gedeeld/layout.php';
+?>
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="nl">

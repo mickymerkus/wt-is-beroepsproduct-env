@@ -6,7 +6,7 @@
             <p> Er zijn geen producten in deze categorie.</p>
         <?php endif; ?>
 
-        <?php foreach ($producten as $product): ?>
+        <?php foreach ($producten as $index => $product): ?>
             <?php include __DIR__ . '/productkaart.php'; ?>
         <?php endforeach ?>
     </section>

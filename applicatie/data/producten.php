@@ -3,7 +3,8 @@
 require_once __DIR__ . '/db_connectie.php';
 
 // Haal producten op van een bepaalde categorie (pizza, drank etc.)
-function haalProductenMetIngredienten($verbinding, $categorie) {
+function haalProductenMetIngredienten($verbinding, $categorie): array 
+{
     $sql = '
         SELECT p.name, p.price, pi.ingredient_name
         FROM Product p
@@ -19,7 +20,8 @@ function haalProductenMetIngredienten($verbinding, $categorie) {
 }
 
 //Zorg dat de ingredienten bij elk product komen te staan als list in een array
-function _groepeerOpProduct(array $rijen) {
+function _groepeerOpProduct(array $rijen): array 
+{
     $producten = [];
 
     foreach ($rijen as $rij) {
@@ -41,5 +43,42 @@ function _groepeerOpProduct(array $rijen) {
     return array_values($producten);
 }
 
+// Haal de prijzen van een lijst producten op
+function haalPrijzenVanProducten($verbinding): array 
+{
+    $sql = '
+        SELECT name, price
+        FROM Product
+    ';
+
+    $query = $verbinding->prepare($sql);
+    $query->execute();
+
+    $prijzen = [];
+
+    foreach ($query->fetchAll() as $rij) {
+        $prijzen[$rij['name']] = $rij['price'];
+    }
+
+    //var_dump($prijzen); die();
+    return $prijzen;
+
+}
+
+// Valideer of een bepaald product ook echt in de database te vinden is.
+function bestaatProduct($verbinding, $naam): bool
+{
+    $sql = '
+        SELECT 1
+        FROM Product
+        WHERE name := $name
+    ';
+
+    $query = $verbinding->prepare($sql);
+    $query->execute([':naam' => $naam]);
+
+    //Check of er een rij is mbv fetchColumn()
+    return $query->fetchColumn() !== false;
+}
 
 ?>
