@@ -13,7 +13,7 @@
     <?php include __DIR__ . "/header.php";?>
     
     <?php if (!empty($toonBanner)): ?>
-        <?php include __DIR__ . "header_banner.php"; ?>
+        <?php include __DIR__ . "/header_banner.php"; ?>
     <?php endif; ?>
 
     <?php include $inhoud; ?>

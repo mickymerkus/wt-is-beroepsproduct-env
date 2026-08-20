@@ -23,19 +23,19 @@ function _groepeerOpProduct(array $rijen) {
     $producten = [];
 
     foreach ($rijen as $rij) {
-        $naam = $rij[$name];
+        $naam = $rij['name'];
 
 
         if (!isset($gegroepeerd[$naam])) {
             $gegroepeerd[$naam] = [
                 'naam' => $naam,
-                'prijs' => $rij[$price],
+                'prijs' => $rij['price'],
                 'ingredienten' => [],
             ];
         }
 
-        if ($rij['ingredient_name' !== null]) {
-            $gegroepeerd[$naam]['ingredienten'][] = $rij['ingredient_name']
+        if ($rij['ingredient_name'] !== null) {
+            $gegroepeerd[$naam]['ingredienten'][] = $rij['ingredient_name'];
         }
     }
     return array_values($producten);
