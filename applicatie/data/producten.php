@@ -26,8 +26,8 @@ function _groepeerOpProduct(array $rijen) {
         $naam = $rij['name'];
 
 
-        if (!isset($gegroepeerd[$naam])) {
-            $gegroepeerd[$naam] = [
+        if (!isset($producten[$naam])) {
+            $producten[$naam] = [
                 'naam' => $naam,
                 'prijs' => $rij['price'],
                 'ingredienten' => [],
@@ -35,7 +35,7 @@ function _groepeerOpProduct(array $rijen) {
         }
 
         if ($rij['ingredient_name'] !== null) {
-            $gegroepeerd[$naam]['ingredienten'][] = $rij['ingredient_name'];
+            $producten[$naam]['ingredienten'][] = $rij['ingredient_name'];
         }
     }
     return array_values($producten);
