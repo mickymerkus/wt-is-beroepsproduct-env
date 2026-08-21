@@ -4,7 +4,7 @@
     // Probeert in te loggen, als het lukt komt de gebruiker in de sessie te staan, zoniet dan returnt de functie false
     function logInGebruiker($verbinding, $username, $wachtwoord): bool
     {
-        $gebruiker = haalGebruikerOpMetUsername($verbinding, $username);
+        $gebruiker = haalGebruikerOpMetGebruikersnaam($verbinding, $username);
 
         if (!$gebruiker) {
             return false;

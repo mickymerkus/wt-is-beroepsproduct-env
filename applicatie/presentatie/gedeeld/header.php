@@ -14,10 +14,17 @@
                         <?php endif; ?>
                     </a>
                 </li>
-                <li><a href="login.php">Inloggen</a></li>
-                <li><a href="registratie.php">Registreren</a></li>
+                <?php if (isIngelogd()): ?>
+                    <li>
+                        <form action="uitloggen.php" method="post" class="uitlog-formulier">
+                            <button type="submit">Uitloggen</button>
+                        </form>
+                    </li>
+                    <?php else: ?>
+                        <li><a href="login.php">Inloggen</a></li>
+                        <li><a href="registratie.php">Registreren</a></li>
+                    <?php endif; ?>
                 <li><a href="privacy.php">Privacy</a></li>
             </ul>
-
         </nav>
     </header>

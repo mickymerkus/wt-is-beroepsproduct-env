@@ -1,63 +1,43 @@
+<?php
+    require_once __DIR__ . '/data/db_connectie.php';
+    require_once __DIR__ . '/logica/sessie.php';
+    require_once __DIR__ . '/logica/winkelmandje.php';
+    require_once __DIR__ . '/logica/authenticatie.php';
 
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account aanmaken</title>
-    <link rel="icon" type="image/png" href="./images/icon.png">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <header>
+    startSessie();
 
-    </header>
-    <div class="banner"><img class="banner-img" src="./images/banner.png" alt="een getekend plaatje met een pizza-oven en een italiaans landschap in zonnige kleuren."></div>
-    <main>
-        <section class="formulier">
-            <a href="index.php">Terug naar Homepage.</a>
-            <form action="index.php" method="post">
-                
-                <fieldset class="formulier-sectie">
-                    <legend>Accountgegevens</legend>
-                    <div class="formulier-veld">
-                        <label for="gebruikersnaam">Gebruikersnaam</label>
-                        <input type="text" id="gebruikersnaam" name="gebruikersnaam">
-                        
-                        <label for="wachtwoord">Wachtwoord</label>
-                        <input type="text" id="wachtwoord" name="wachtwoord">
+    $db = maakVerbinding();
 
-                        <label for="bevestig-wachtwoord">Bevestig wachtwoord</label>
-                        <input type="text" id="bevestig-wachtwoord" name="bevestig-wachtwoord">
-                    </div>
-                </fieldset>
+    $fouten = [];
 
-                <fieldset class="formulier-sectie">
-                    <legend>Adresgegevens</legend>
-                    <div class="formulier-veld straat">
-                        <label for="straat">Straat</label>
-                        <input type="text" id="straat" name="straat">
-                    </div>
-                    <div class="formulier-veld">
-                        <label for="huisnummer">Huisnummer</label>
-                        <input type="text" id="huisnummer" name="huisnummer">
-                    </div>
-                    <div class="formulier-veld">
-                        <label for="stad">Stad</label>
-                        <input type="text" id="stad" name="stad">
-                    </div>
-                    <div class="formulier-veld">
-                        <label for="postcode">Postcode</label>
-                        <input type="text" id="postcode" name="postcode">
-                    </div>
-                </fieldset>
-               <button type="submit">Account aanmaken</button>
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $fouten = registreerGebruiker(
+            $db,
+            $_POST['gebruikersnaam'] ?? '',
+            $_POST['wachtwoord'] ?? '',
+            $_POST['bevestig-wachtwoord'] ?? '',
+            $_POST['voornaam'] ?? '',
+            $_POST['achternaam'] ?? '',
+            $_POST['straat'] ?? '',
+            $_POST['huisnummer'] ?? '',
+            $_POST['postcode'] ?? '',
+            $_POST['stad'] ?? ''
+        );
 
-            </form>
-        </section>
-    </main>
-    <footer>
+        if (!$fouten) {
+            header('Location: index.php');
+            exit;
+        }
+    }
 
-    </footer>
-</body>
-</html>
+    $aantalInMandje = aantalArtikelenInMandje();
+
+    // Config
+    $paginaTitel = 'Account aanmaken';
+    $bodyKlasse = 'registratie';
+    $toonBanner = true;
+    $toonBestelknop = false;
+    $inhoud = __DIR__ . '/presentatie/registratie.php';
+
+    include __DIR__ . '/presentatie/gedeeld/layout.php';
+?>

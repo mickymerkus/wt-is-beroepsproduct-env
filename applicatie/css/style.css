@@ -124,7 +124,7 @@ form {
 }
 
 
-/* Formulieren (registratie en bevestig bestelling)*/
+/* Formulieren (registratie en bevestig bestelling en ook uitloggen)*/
 .formulier {
     display: flex;
     flex-direction: column;
@@ -166,6 +166,34 @@ input[type="text"] {
 
 .actief {
     font-weight: bold;
+}
+
+.foutmelding,
+.foutmeldingen {
+    color: #b00020;
+    background-color: #fdecea;
+    border: 1px solid #b00020;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.foutmeldingen li {
+    margin-left: 1rem;
+}
+
+.uitlog-formulier {
+    display: inline;
+}
+
+
+.uitlog-formulier button {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
 }
 
 /* Login pagina */

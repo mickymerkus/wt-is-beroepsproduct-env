@@ -1,38 +1,36 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inloggen</title>
-    <link rel="icon" type="image/png" href="./images/icon.png">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <header>
-        <a href="index.php"><img class="header-logo"  src="./images/header-logo.png" alt="pizzeria logo en link naar homepage"></a> 
-        Pizzeria Sole Machina
+<?php
+    require_once __DIR__ . '/data/db_connectie.php';
+    require_once __DIR__ . '/logica/sessie.php';
+    require_once __DIR__ . '/logica/winkelmandje.php';
+    require_once __DIR__ . '/logica/authenticatie.php';
 
-    </header>
-    <main class="login-page">
-        <section class="login-card">
-            <h2>Inloggen</h2>
-            <img class="login-logo" src="./images/logo.png" alt="pizzeria logo">
-            <form method="post">
-                <div class="formulier-veld">
-                    <label for="gebruikersnaam">Gebruikersnaam:</label>
-                    <input type="text" name="gebruikersnaam" id="gebruikersnaam">
-                </div>
-                <div class="formulier-veld">
-                    <label for="wachtwoord">Wachtwoord</label>
-                    <input type="password" name="wachtwoord" id="wachtwoord">
-                </div>
-                <button type="submit">Inloggen</button>
-            </form>
-            <a href="registratie.php">Account aanmaken</a>
-        </section>
-    </main>
-    <footer>
-        <a href="privacy.php">Privacy Statement</a>
-    </footer>
-</body>
-</html>
+    startSessie();
+
+    $db = maakVerbinding();
+
+    $foutmelding = '';
+
+    // Verwerk de inlogpoging en als er iets niet klopt geef een foutmelding
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $username = $_POST['gebruikersnaam'] ?? '';
+        $wachtwoord = $_POST['wachtwoord'] ?? '';
+
+        if (logInGebruiker($db, $username, $wachtwoord)) {
+            header('Location: index.php');
+            exit;
+        }
+
+        $foutmelding = 'Gebruikersnaam of wachtwoord is onjuist.';
+    }
+
+    $aantalInMandje = aantalArtikelenInMandje();
+
+    // Config
+    $paginaTitel = 'Inloggen';
+    $bodyKlasse = 'login-page';
+    $toonBanner = false;
+    $toonBestelknop = false;
+    $inhoud = __DIR__ . '/presentatie/login.php';
+
+    include __DIR__ . '/presentatie/gedeeld/layout.php';
+?>

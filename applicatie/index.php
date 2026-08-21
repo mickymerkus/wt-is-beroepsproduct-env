@@ -3,6 +3,8 @@
     require_once __DIR__ . '/data/producten.php';
     require_once __DIR__ . '/logica/sessie.php';
     require_once __DIR__ . '/logica/winkelmandje.php';
+    require_once __DIR__ . '/logica/authenticatie.php';
+
 
     // Sessie starten zodat de sessiecookie wordt meegestuurd.
     startSessie();
