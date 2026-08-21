@@ -14,10 +14,10 @@
     <form class="toevoegen-formulier" action="index.php" method="post">
             <input type="hidden" name="actie" value="toevoegen">
             <input type="hidden" name="product" value="<?= htmlspecialchars($product['naam']) ?>">
-            <input type="hidden" name="categorie" value= <?= htmlspecialchars($categorie) ?>>
+            <input type="hidden" name="categorie" value="<?= htmlspecialchars($categorie) ?>">
 
             <label for="aantal-<?= $index ?>">Aantal</label>
-            <input type="number" id="aantal-<?= $index ?>" value="1" min="1" max=<?= MAX_AANTAL ?>>
+            <input type="number" name="aantal" id="aantal-<?= $index ?>" value="1" min="1" max="<?= MAX_AANTAL ?>">
 
             <button type="submit">Toevoegen</button>
     </form>

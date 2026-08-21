@@ -17,6 +17,8 @@
 
     // update het winkelmandje met de nieuwe aantallen en bewaar in de sessie
     function voegToeAanWinkelmandje($naam, $aantal) {
+        $winkelmandje = haalWinkelmandje();
+
         $nieuwAantal = ($winkelmandje[$naam] ?? 0) + $aantal;
 
         //Zorgen dat het aantal onder de max blijft
@@ -42,11 +44,19 @@
         }
 
         //Kan alleen wijzigen als het al bestaat, dus check dit
-        if (isset($winkelmandje($naam))) {
+        if (isset($winkelmandje[$naam])) {
             $winkelmandje[$naam] = $nieuwAantal;
             bewaarWinkelmandje($winkelmandje);
         }
     }
+
+    // verlaag het aantal van een product met één. Bij 0 verwijdert wijzigAantal het product uit het mandje
+    function verlaagInWinkelmandje($naam) {
+        $winkelmandje = haalWinkelmandje();
+
+        wijzigAantal($naam, ($winkelmandje[$naam] ?? 0) - 1);
+    }
+
 
     // Haal een product uit het mandje
     function verwijderUitWinkelmandje($naam) {
@@ -67,7 +77,7 @@
             return [];
         }
 
-        $prijzen = haalPrijzenVanProducten(($verbinding));
+        $prijzen = haalPrijzenVanProducten($verbinding);
 
         $regels = [];
 
@@ -97,7 +107,7 @@
         $totaal = 0;
 
         foreach ($regels as $regel) {
-            $totaal += $regel['regeltotaal'];
+            $totaal += $regel['regelTotaal'];
         }
 
         return $totaal;
@@ -124,12 +134,12 @@
             if ($aantal >= 1) {
                 voegToeAanWinkelmandje($naam, $aantal);
             }
-        } elseif ($actie === 'wijzigen') {
+        } elseif ($actie === 'verhogen') {
             // 0 of minder betekent de regel weghalen
-            wijzigAantal($naam, $aantal);
+            voegToeAanWinkelmandje($naam, 1);
+        } elseif ($actie === 'verlagen') {
+            verlaagInWinkelmandje($naam);
         } elseif ($actie === 'verwijderen') {
             verwijderUitWinkelmandje($naam);
         }
     }
-
-?>

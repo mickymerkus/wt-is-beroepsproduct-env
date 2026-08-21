@@ -280,20 +280,16 @@ input[type="text"] {
 .toevoegen-formulier input[type="number"] { max-width: 6ch; }
 
 /* Grid in plaats van flex, zodat justify-self op .aantal, .naam-product en
-   .prijs-product blijft werken. Vijf kolommen voor de vijf zichtbare velden,
-   de verborgen inputs krijgen geen cel. */
+   .prijs-product blijft werken. Zes kolommen zichtbaar: (min, aantal, plus, naam, prijs, verwijderen). */
 .regel-formulier {
     display: grid;
-    grid-template-columns: auto 1fr auto auto auto;
+    grid-template-columns: auto auto auto 1fr auto auto;
     align-items: center;
     gap: 0.5rem;
     width: 100%;
 }
 
 .regel-formulier input[type="number"] { max-width: 5ch; }
-
-
-
 
 
 .prijs {
@@ -361,8 +357,6 @@ input[type="text"] {
     background-color: #4C7A43;
 }
 
-/* In het winkelmandje zit de inhoud van een regel in een formulier, dus staat
-   de indeling daar. Moet na .bestelling-regel staan, gelijke specificiteit. */
 .winkelmandje-regel {
     display: block;
 }

@@ -1,4 +1,3 @@
-
 <?php 
 
 // Wordt gebruikt voor het starten en managen van de sessies
@@ -19,5 +18,3 @@ function startSessie(): void
 
     session_start();
 }
-
-?>

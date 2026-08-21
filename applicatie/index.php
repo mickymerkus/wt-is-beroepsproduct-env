@@ -15,8 +15,8 @@
     // Bij post staat het in het formulier, bij get in de url
     $gevraagd = $_POST['categorie'] ?? $_GET['categorie'] ?? '';
 
-    // Afscherming van de parameter, default staat op pizza
-    $categorie = in_array($gevraagd, $categorieen, true) ? $gevraagd : 'pizza';
+    // Afscherming van de parameter, default staat op de eerste waarde in de database
+    $categorie = in_array($gevraagd, $categorieen, true) ? $gevraagd : $categorieen[0] ?? '';
 
     // Toevoegen, wijzigen of verwijderen in het winkelmandje
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {

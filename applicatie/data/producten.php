@@ -71,7 +71,7 @@ function bestaatProduct($verbinding, $naam): bool
     $sql = '
         SELECT 1
         FROM Product
-        WHERE name := $name
+        WHERE name = :naam
     ';
 
     $query = $verbinding->prepare($sql);
