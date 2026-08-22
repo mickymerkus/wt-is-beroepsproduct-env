@@ -32,9 +32,16 @@
         return $query->fetchColumn() !== false;
     }
 
-    // Maak een nieuw account aan. Wachtwoord moet hiervoor al gehashed zijn. TODO: kijken waar we dit het beste kunnen doen.
+    // Maak een nieuw account aan. Wachtwoord moet hiervoor al gehashed zijn.
     // Ivm security hardcoden we de rol. Personeelsaccount doen we apart zodat dat nooit gehacked kan worden.
-    function maakGebruikerAan($verbinding, $username, $wachtwoordHash, $voornaam, $achternaam, $adres): void
+    function maakGebruikerAan(
+        $verbinding, 
+        $username, 
+        $wachtwoordHash, 
+        $voornaam, 
+        $achternaam, 
+        $adres
+        ): void
     {
         $sql = '
             INSERT INTO [User] (username, password, first_name, last_name, address, role)
@@ -50,6 +57,22 @@
             ':adres' => $adres,
             ':rol' => 'Client',
         ]);
+    }
+
+
+    // Adres van gebruiker ophalen zodat ze het niet opnieuw hoeven in te vullen in het bestelformulier
+    function haalAdresVanGebruiker($verbinding, $gebruikersnaam)
+    {
+        $sql = '
+            SELECT [address]
+            FROM [User]
+            WHERE username = :gebruikersnaam
+        ';
+
+        $query = $verbinding->prepare($sql);
+        $query->execute([':gebruikersnaam' => $gebruikersnaam]);
+
+        return $query->fetchColumn();
     }
 
 ?>

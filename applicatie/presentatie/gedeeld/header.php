@@ -14,6 +14,7 @@
                         <?php endif; ?>
                     </a>
                 </li>
+                <li><a href="bestelling_geschiedenis.php">Mijn bestellingen</a></li>
                 <?php if (isIngelogd()): ?>
                     <li>
                         <form action="uitloggen.php" method="post" class="uitlog-formulier">

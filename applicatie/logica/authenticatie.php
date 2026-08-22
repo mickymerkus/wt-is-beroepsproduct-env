@@ -1,5 +1,6 @@
 <?php
     require_once __DIR__ . '/../data/gebruikers.php';
+    require_once __DIR__ . '/adres.php';
 
     // Probeert in te loggen, als het lukt komt de gebruiker in de sessie te staan, zoniet dan returnt de functie false
     function logInGebruiker($verbinding, $username, $wachtwoord): bool
@@ -84,7 +85,7 @@
         }
 
         // Adres is één veld in de database, dus we concateneren alle info
-        $adres = $straat . ' ' . $huisnummer . ', ' . $postcode . ' ' . $stad;
+        $adres = maakAdresRegel($straat, $huisnummer, $postcode, $stad);
         $wachtwoordHash = password_hash($wachtwoord, PASSWORD_DEFAULT);
 
         maakGebruikerAan($verbinding, $username, $wachtwoordHash, $voornaam, $achternaam, $adres);

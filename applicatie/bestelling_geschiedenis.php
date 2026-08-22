@@ -1,89 +1,45 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Besteloverzicht</title>
-    <link rel="icon" type="image/png" href="./images/icon.png">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <header>
+<?php
+    require_once __DIR__ . '/data/db_connectie.php';
+    require_once __DIR__ . '/data/bestellingen.php';
+    require_once __DIR__ . '/logica/sessie.php';
+    require_once __DIR__ . '/logica/winkelmandje.php';
+    require_once __DIR__ . '/logica/authenticatie.php';
+    require_once __DIR__ . '/logica/bestelling.php';
 
-    </header>
-    <div class="banner"><img class="banner-img" src="./images/banner.png" alt="een getekend plaatje met een pizza-oven en een italiaans landschap in zonnige kleuren."></div>
-    <main class="bestelling-geschiedenis">
-        <h1>Besteloverzicht</h1>
-        <article class="bestelling-met-status">
-            <header>
-                <h2 id="bestelnr-1015">Bestelnummer: 1015</h2>
-                <h3 id="status-bestelling-1015">Status: Wordt bezorgd</h3>
-                <span>Datum: ......</span>
-            </header>
-            <h3>Bestelling details:</h3>
-            <ul class="bestelling-regels">
-                <li class="bestelling-regel">
-                    <span class="aantal">1x</span>
-                    <span class="naam-product">pizza mozzerella</span>
-                    <span class="prijs-product">€12.00</span>
-                </li>
-                <li class="bestelling-regel">
-                    <span class="aantal">1x</span>
-                    <span class="naam-product">pizza salami</span>
-                    <span class="prijs-product">€12.00</span>
-                </li>
-                <li class="bestelling-regel">
-                    <span class="aantal">1x</span>
-                    <span class="naam-product">pizza fungi</span>
-                    <span class="prijs-product">€12.00</span>
-                </li>
-                <li class="bestelling-regel">
-                    <span class="aantal">1x</span>
-                    <span class="naam-product">pizza pepperoni</span>
-                    <span class="prijs-product">€12.00</span>
-                </li>
-            </ul>
-            <footer>
-                <p class="totaal">Totaal: €x.xx</p>
-            </footer>
-        </article>
+    startSessie();
 
-        <article class="bestelling-met-status">
-            <header>
-                <h2 id="bestelnr-1014">Bestelnummer: 1014</h2>
-                <h3 id="status-bestelling-1014">Status: Afgeleverd</h3>
-                <span>Datum: ......</span>
-            </header>
-            <h3>Bestelling details:</h3>
-            <ul class="bestelling-regels">
-                <li class="bestelling-regel">
-                    <span class="aantal">1x</span>
-                    <span class="naam-product">pizza mozzerella</span>
-                    <span class="prijs-product">€12.00</span>
-                </li>
-                <li class="bestelling-regel">
-                    <span class="aantal">1x</span>
-                    <span class="naam-product">pizza salami</span>
-                    <span class="prijs-product">€12.00</span>
-                </li>
-                <li class="bestelling-regel">
-                    <span class="aantal">1x</span>
-                    <span class="naam-product">pizza fungi</span>
-                    <span class="prijs-product">€12.00</span>
-                </li>
-                <li class="bestelling-regel">
-                    <span class="aantal">1x</span>
-                    <span class="naam-product">pizza pepperoni</span>
-                    <span class="prijs-product">€12.00</span>
-                </li>
-            </ul>
-            <footer>
-                <p class="totaal">Totaal: €x.xx</p>
-            </footer>
-        </article>
-    </main>
-    <footer>
+    $db = maakVerbinding();
 
-    </footer>
-</body>
-</html>
+    // Mag leeg zijn: ook een gast moet de bestelling kunnen volgen die hij net plaatste
+    $gebruiker = huidigeGebruiker();
+
+    if ($gebruiker) {
+        // Een ingelogde klant ziet de historie van zijn bestellingen
+        $bestellingen = haalBestellingenVanKlant($db, $gebruiker['username']);
+    } else {
+        // Een gast heeft alleen het bestelnummer dat bij het plaatsen in de sessie is gezet
+        $bestellingen = haalBestellingMetBestelnummer($db, $_SESSION['laatsteBestelling'] ?? 0);
+    }
+
+    // Zorgen dat alle waarden zijn berekend voor het tonen van de bestellingen
+    // in het template.
+    foreach ($bestellingen as $index => $bestelling) {
+        $bestellingen[$index]['totaal']       = berekenTotaal($bestelling['regels']);
+        $bestellingen[$index]['statusTekst']  = statusOmschrijving($bestelling['status']);
+        $bestellingen[$index]['statusKlasse'] = statusCssKlasse($bestelling['status']);
+    }
+
+
+    // Staat in de url na de redirect vanaf het bestelformulier
+    $isGeplaatst = ($_GET['geplaatst'] ?? '') === '1';
+
+    $aantalInMandje = aantalArtikelenInMandje();
+
+    // Config
+    $paginaTitel = 'Besteloverzicht';
+    $bodyKlasse  = 'geschiedenis-pagina';
+    $toonBanner  = true;
+    $inhoud      = __DIR__ . '/presentatie/bestelling_geschiedenis.php';
+
+    include __DIR__ . '/presentatie/gedeeld/layout.php';
+?>

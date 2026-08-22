@@ -182,6 +182,15 @@ input[type="text"] {
     margin-left: 1rem;
 }
 
+.melding-geslaagd {
+    color: var(--success);
+    background-color: #eef5ec;
+    border: 1px solid var(--success);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
 .uitlog-formulier {
     display: inline;
 }
@@ -494,6 +503,8 @@ input[type="text"] {
 .status-box.on-hold { background-color: #8C8C8C; }
 .status-box.wordt-bezorgd { background-color: var(--secondary); }
 .status-box.geannuleerd { background-color: var(--danger); }
+.status-box.onbekend { background-color: #8C8C8C; }
+
 
 .order-no {
     padding: 0.1rem;
