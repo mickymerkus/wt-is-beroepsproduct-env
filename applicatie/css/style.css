@@ -504,7 +504,14 @@ input[type="text"] {
 .status-box.wordt-bezorgd { background-color: var(--secondary); }
 .status-box.geannuleerd { background-color: var(--danger); }
 .status-box.onbekend { background-color: #8C8C8C; }
+.status-box.afgeleverd { background-color: var(--success); }
 
+
+.status-formulier {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
 
 .order-no {
     padding: 0.1rem;

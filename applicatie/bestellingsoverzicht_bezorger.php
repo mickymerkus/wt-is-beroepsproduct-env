@@ -1,75 +1,48 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bezorger Homepage</title>
-    <link rel="icon" type="image/png" href="./images/icon.png">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <header>
-        <a href="bestellingsoverzicht_bezorger.php"><img class="header-logo" src="./images/header-logo.png" alt="pizzeria logo en link naar bezorger-overzicht"></a>
-        <a class="rol-wissel" href="bestellingsoverzicht_personeel.php">Bekijk keuken-overzicht</a>
-        <a class="logout-knop" href="login.php">Uitloggen</a>
-    </header>
-    <main class="column-card-container">
-        <article class="bestelling-card">
-            <header class="bestelling-card-header">
-                <div class="status-box klaar-voor-bezorging">Klaar voor bezorging</div>
-                <p class="order-no">Bestelnummer: 1019</p>
-            </header>
-            <section class="order-details">
-                <div class="klant-gegevens">
-                    <p class="klant-naam">Jaap de Vries</p>
-                    <p class="klant-adres">Meijhorst 3010, 4545DD Nijmegen </p>
-                    <p class="klant-betaalmethode">Betaalmethode: iDeal</p>
-                </div>
-                <ul class="bestelling-regels">
-                    <li class="bestelling-regel">
-                        <span class="aantal">1x</span>
-                        <span class="naam-product">pizza mozzerella</span>
-                        <span class="prijs-product">€12.00</span>
-                    </li>
-                    <li class="bestelling-regel">
-                        <span class="aantal">1x</span>
-                        <span class="naam-product">pizza salami</span>
-                        <span class="prijs-product">€12.00</span>
-                    </li>
-                </ul>
-            </section>
-            <footer class="bestelling-card-footer">
-                <button type="button" class="status-knop">Wordt bezorgd</button>
-                <button type="button" class="print-knop">Print bon</button>
-            </footer>
-        </article>
-        <article class="bestelling-card">
-            <header class="bestelling-card-header">
-                <div class="status-box wordt-bezorgd">Wordt bezorgd</div>
-                <p class="order-no">Bestelnummer: 1018</p>
-            </header>
-            <section class="order-details">
-                <div class="klant-gegevens">
-                    <p class="klant-naam">Voornaam achternaam</p>
-                    <p class="klant-adres">straat huisnummer stad postcode</p>
-                    <p class="klant-betaalmethode">Betaalmethode: Contant</p>
-                </div>
-                <ul class="bestelling-regels">
-                    <li class="bestelling-regel">
-                        <span class="aantal">2x</span>
-                        <span class="naam-product">pizza fungi</span>
-                        <span class="prijs-product">€12.00</span>
-                    </li>
-                </ul>
-            </section>
-            <footer class="bestelling-card-footer">
-                <button type="button" class="status-knop" disabled>Wordt bezorgd</button>
-                <button type="button" class="print-knop">Print bon</button>
-            </footer>
-        </article>
-    </main>
-    <footer>
+<?php
+    require_once __DIR__ . '/data/db_connectie.php';
+    require_once __DIR__ . '/data/bestellingen.php';
+    require_once __DIR__ . '/logica/sessie.php';
+    require_once __DIR__ . '/logica/winkelmandje.php';
+    require_once __DIR__ . '/logica/authenticatie.php';
+    require_once __DIR__ . '/logica/bestelling.php';
 
-    </footer>
-</body>
-</html>
+    startSessie();
+
+    // Check of het echt personeel is, zoniet dan wordt je naar de inlogpagina gestuurd.
+    if (!isPersoneel()) {
+        header('Location: login.php');
+        exit;
+    }
+
+    $db = maakVerbinding();
+
+    // Statuswijziging verwerken en daarna redirecten, zodat F5 niet opnieuw opslaat
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['actie'] ?? '') === 'status_wijzigen') {
+        wijzigBestellingStatus($db, $_POST);
+
+        header('Location: bestellingsoverzicht_bezorger.php');
+        exit;
+    }
+
+    // Haal de bestellingen op die klaarstaan voor bezorging of al onderweg zijn.
+    $bestellingen = haalBestellingenMetStatus($db, BEZORGER_VAN, BEZORGER_TOT);
+
+    // Alles wat het template moet tonen alvast klaarzetten
+    foreach ($bestellingen as $index => $bestelling) {
+        $bestellingen[$index]['totaal']       = berekenTotaal($bestelling['regels']);
+        $bestellingen[$index]['statusTekst']  = statusOmschrijving($bestelling['status']);
+        $bestellingen[$index]['statusKlasse'] = statusCssKlasse($bestelling['status']);
+    }
+
+    // Haal alle statussen
+    $statussen = alleStatussen();
+    // Nodig doordat die in layout.php bevat is
+    $aantalInMandje = aantalArtikelenInMandje();
+
+    // Config
+    $paginaTitel = 'Bezorgoverzicht';
+    $bodyKlasse  = 'bezorger-pagina';
+    $toonBanner  = false;
+    $inhoud      = __DIR__ . '/presentatie/bestellingsoverzicht_bezorger.php';
+
+    include __DIR__ . '/presentatie/gedeeld/layout.php';

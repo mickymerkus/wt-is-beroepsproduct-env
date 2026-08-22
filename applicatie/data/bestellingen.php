@@ -72,6 +72,7 @@
                     po.datetime,
                     po.status,
                     po.address,
+                    po.client_name,
                     pop.product_name,
                     pop.quantity,
                     pop.quantity * p.price AS regel_totaal
@@ -99,6 +100,7 @@
                     po.datetime,
                     po.status,
                     po.address,
+                    po.client_name,
                     pop.product_name,
                     pop.quantity,
                     pop.quantity * p.price AS regel_totaal
@@ -131,6 +133,7 @@
                     'datum' => $rij['datetime'],
                     'status' => $rij['status'],
                     'adres' => $rij['address'],
+                    'klant_naam' => $rij['client_name'],
                     'regels' => [],
                 ];
             }
@@ -143,4 +146,48 @@
         }
 
         return array_values($bestellingen);
+    }
+
+    // Haal alle bestellingen op met 
+    // De keuken vraagt 1 t/m 3 op, de bezorger 4 t/m 5. 
+    // Afgeleverd en geannuleerd worden niet meegenomen, zodat alleen de to do bestellingen er zijn.
+    function haalBestellingenMetStatus($verbinding, $vanStatus, $totStatus): array
+    {
+        $sql = '
+            SELECT  po.order_id,
+                    po.datetime,
+                    po.status,
+                    po.address,
+                    po.client_name,
+                    pop.product_name,
+                    pop.quantity,
+                    pop.quantity * p.price AS regel_totaal
+            FROM Pizza_Order po
+            JOIN Pizza_Order_Product pop ON pop.order_id = po.order_id
+            JOIN Product p ON p.name = pop.product_name
+            WHERE po.status BETWEEN :van AND :tot
+            ORDER BY po.datetime, po.order_id, pop.product_name
+        ';
+
+        $query = $verbinding->prepare($sql);
+        $query->execute([':van' => $vanStatus, ':tot' => $totStatus]);
+
+        return _groepeerOpBestelling($query->fetchAll());
+    }
+
+
+    // Update de status van een bestelling. 
+    function werkBestellingStatusBij($verbinding, $bestelNummer, $status): void
+    {
+        $sql = '
+            UPDATE Pizza_Order
+            SET status = :status
+            WHERE order_id = :bestelling
+        ';
+
+        $query = $verbinding->prepare($sql);
+        $query->execute([
+            ':status'     => $status,
+            ':bestelling' => $bestelNummer,
+        ]);
     }

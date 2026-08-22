@@ -7,11 +7,35 @@
 
     // In de database staan alleen maar de getallen, dus de mapping naar de betekenis ervan
     // is hier vastgezet.
-    // TODO: bedenken of ik dit toch in de database wil zetten, maar dan moet ik ook iets van 
-    // een migratiescriptje maken en volgens de reader mag dit niet.
-    const STATUS_IN_WACHTRIJ = 1;
-    const STATUS_WORDT_GEMAAKT = 2;
-    const STATUS_KLAAR_VOOR_BEZORGING = 3;
+    // De volgorde is belangrijk. 
+    const STATUS_IN_WACHTRIJ          = 1;
+    const STATUS_WORDT_GEMAAKT        = 2;
+    const STATUS_IN_DE_OVEN           = 3;
+    const STATUS_ON_HOLD              = 4;
+    const STATUS_KLAAR_VOOR_BEZORGING = 5;
+    const STATUS_WORDT_BEZORGD        = 6;
+    const STATUS_AFGELEVERD           = 7;
+    const STATUS_GEANNULEERD          = 8;
+
+    // De keuken werkt aan 1 t/m 4, de bezorger aan 5 en 6. 
+    // Deze constantes worden gebruikt voor de bestellingoverzichten.
+    const KEUKEN_VAN   = STATUS_IN_WACHTRIJ;
+    const KEUKEN_TOT   = STATUS_ON_HOLD;
+    const BEZORGER_VAN = STATUS_KLAAR_VOOR_BEZORGING;
+    const BEZORGER_TOT = STATUS_WORDT_BEZORGD;
+
+
+    // Bouw de opties voor het statusmenu: statuscode => tekst.
+    function alleStatussen(): array
+    {
+        $statussen = [];
+
+        for ($code = STATUS_IN_WACHTRIJ; $code <= STATUS_GEANNULEERD; $code++) {
+            $statussen[$code] = statusOmschrijving($code);
+        }
+        return $statussen;
+    }
+    
 
     // Plaats de bestelling die op dat moment in het winkelmandje zit.
     // Geeft een lijst met foutmeldingen terug, of een lege lijst als het gelukt is.
@@ -95,39 +119,94 @@
 
 
     // Mapping voor de database status (int) naar wat getoond kan worden aan de gebruiker
-    function statusOmschrijving(string $status): string
+    function statusOmschrijving($status): string
     {
         // Cast status naar een int om bugs te voorkomen. Wordt als string uit de database gehaald.
         switch ((int) $status) {
             case STATUS_IN_WACHTRIJ:
                 return 'In de wachtrij';
-
             case STATUS_WORDT_GEMAAKT:
                 return 'Wordt gemaakt';
-
+            case STATUS_IN_DE_OVEN:
+                return 'In de oven';
+            case STATUS_ON_HOLD:
+                return 'On hold';
             case STATUS_KLAAR_VOOR_BEZORGING:
                 return 'Klaar voor bezorging';
+            case STATUS_WORDT_BEZORGD:
+                return 'Wordt bezorgd';
+            case STATUS_AFGELEVERD:
+                return 'Afgeleverd';
+            case STATUS_GEANNULEERD:
+                return 'Geannuleerd';
 
-            // status is nullable in de database en ik wil meer statussen toevoegen, dus tot dan moeten deze opgevangen worden
+            // status is nullable in de database, dus een onbekende waarde vangen we hier op
             default:
                 return 'Onbekend';
         }
     }
 
-    // Verander de kleur afhankelijk van de status. Geeft de naam van de CSS klasse terug
+    // Verander de kleur afhankelijk van de status. Geef de naam van de CSS klasse terug
     function statusCssKlasse($status): string
     {
         switch ((int) $status) {
             case STATUS_IN_WACHTRIJ:
                 return 'in-wachtrij';
-
             case STATUS_WORDT_GEMAAKT:
                 return 'wordt-gemaakt';
-
+            case STATUS_IN_DE_OVEN:
+                return 'in-de-oven';
+            case STATUS_ON_HOLD:
+                return 'on-hold';
             case STATUS_KLAAR_VOOR_BEZORGING:
                 return 'klaar-voor-bezorging';
+            case STATUS_WORDT_BEZORGD:
+                return 'wordt-bezorgd';
+            case STATUS_AFGELEVERD:
+                return 'afgeleverd';
+            case STATUS_GEANNULEERD:
+                return 'geannuleerd';
 
             default:
                 return 'onbekend';
         }
+    }
+
+
+    // Validatiefunctie, alleen een status die wij zelf gedefinieerd hebben mag de database in.
+    function isGeldigeStatus($status): bool
+    {
+        switch ((int) $status) {
+            case STATUS_IN_WACHTRIJ:
+            case STATUS_WORDT_GEMAAKT:
+            case STATUS_IN_DE_OVEN:
+            case STATUS_KLAAR_VOOR_BEZORGING:
+            case STATUS_WORDT_BEZORGD:
+            case STATUS_ON_HOLD:
+            case STATUS_AFGELEVERD:
+            case STATUS_GEANNULEERD:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    // Wijzig de status van een bestelling vanuit het personeelsoverzicht.
+    function wijzigBestellingStatus($verbinding, $invoer): array
+    {
+        $bestelNummer = (int) ($invoer['bestelling'] ?? 0);
+        $nieuweStatus = (int) ($invoer['status'] ?? 0);
+
+        if ($bestelNummer <= 0) {
+            return ['Onbekende bestelling.'];
+        }
+
+        // Validatie
+        if (!isGeldigeStatus($nieuweStatus)) {
+            return ['Onbekende status.'];
+        }
+
+        werkBestellingStatusBij($verbinding, $bestelNummer, $nieuweStatus);
+        return [];
     }

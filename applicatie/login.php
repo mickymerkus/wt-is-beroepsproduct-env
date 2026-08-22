@@ -16,7 +16,12 @@
         $wachtwoord = $_POST['wachtwoord'] ?? '';
 
         if (logInGebruiker($db, $username, $wachtwoord)) {
-            header('Location: index.php');
+            // routing van personeel naar het bestellingsoverzicht en normale gebruikers naar het menu.
+            if (isPersoneel()) {
+                header('Location: bestellingsoverzicht_personeel.php');
+            } else {
+                header('Location: index.php');
+            }
             exit;
         }
 

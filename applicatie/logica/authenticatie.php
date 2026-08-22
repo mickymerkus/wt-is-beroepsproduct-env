@@ -43,6 +43,13 @@
         return $_SESSION['gebruiker'] ?? null;
     }
 
+    // Check of de ingelogde gebruiker een personeelslid is.
+    function isPersoneel(): bool
+    {
+        $gebruiker = huidigeGebruiker();
+
+        return $gebruiker !== null && $gebruiker['rol'] === 'Personnel';
+    }
 
     // Registreer een nieuwe klant en doe validatie op de mogelijke gebruikersfouten.
     function registreerGebruiker(
