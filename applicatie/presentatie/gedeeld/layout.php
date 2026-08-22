@@ -18,6 +18,8 @@
 
     <?php include $inhoud; ?>
 
-    <?php include __DIR__ . "/footer.php";?>
+    <?php if ($toonFooter ?? true): ?>
+        <?php include __DIR__ . "/footer.php";?>
+    <?php endif; ?>
 </body>
 </html>

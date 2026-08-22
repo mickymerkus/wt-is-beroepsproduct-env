@@ -18,29 +18,28 @@
 }
 
 /* Generale elementen */
-header {
-    grid-area: header;
+body > header {
     height: var(--header-height);
-    display: flex; 
+    display: flex;
     flex-shrink: 0; /*dont go smaller than set size*/
-    align-items: center; 
+    align-items: center;
     justify-content: flex-start;
 
-    color: brown;
-    background-color: aqua;
+    color: var(--surface);
+    background-color: var(--dark);
 
     gap: 2%;
-    grid-area: header;
     position: sticky;
     top: 0;
 }
 
-header a {
+body > header a {
     display: flex;
     height: 100%;
     margin: 1%;
     align-items: center;
     justify-content: center;
+    color: inherit;
 }
 
 .header-logo {
@@ -50,12 +49,6 @@ header a {
 }
 
 /* Navigatie in de header*/
-.hoofdnavigatie {
-    height: auto;
-    position: static;
-    background-color: transparent;
-}
-
 .hoofdnavigatie ul {
     display: flex;
     gap: 1.5rem;
@@ -90,30 +83,29 @@ body {
     flex-direction: column;
     min-height: 100vh;
     margin: 0;
+    background-color: var(--background);
+    color: var(--text);
 }
 
 
 main {
-    flex: 1; /* Take all leftover space */ 
-    grid-area: main;
-    background-color: #A92D21;
+    flex: 1; /* Take all leftover space */
+    background-color: var(--background);
 }
 
-nav {
-    grid-area: nav;
-    height: var(--nav-height);
-    background-color: var(--dark);
-    position: sticky;
-    top: var(--header-height);
-}
-
-
-
-footer {
-    grid-area: footer;
-    height: 10vh;
+body > footer {
+    min-height: 10vh;
     flex-shrink: 0; /*dont go smaller than set size*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
     background-color: var(--dark);
+    color: var(--background);
+}
+
+body > footer a {
+    color: inherit;
 }
 
 
@@ -154,7 +146,8 @@ form {
     width: 60%;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="password"] {
     width: 100%;
     max-width: 40ch;
 }
@@ -192,7 +185,8 @@ input[type="text"] {
 }
 
 .uitlog-formulier {
-    display: inline;
+    display: flex;
+    align-items: center;
 }
 
 
@@ -206,9 +200,8 @@ input[type="text"] {
 }
 
 /* Login pagina */
-.login-page {
+.login-page main {
     display: flex;
-    height: 80vh;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -248,6 +241,10 @@ input[type="text"] {
     display: grid;
     grid-template-columns: var(--product-winkelmandje-kolommen);
     grid-column: 1; /*alleen boven de producten */
+    height: var(--nav-height);
+    background-color: var(--dark);
+    position: sticky;
+    top: var(--header-height);
 }
 
 .product-tabs ul {
@@ -274,9 +271,8 @@ input[type="text"] {
 }
 
 .banner {
-    grid-area: banner;
     height: 50vh;
-    background-color: #242424;
+    background-color: var(--dark);
 }
 
 .banner-img {
@@ -289,21 +285,24 @@ input[type="text"] {
     display: grid;
     grid-template-columns: 1fr;
     justify-items: center;
-    align-items: center;
-    background-color: #C53A2C;
+    align-content: start;
+    gap: 1rem;
+    padding: 1rem 0;
 }
 
 .product-card {
     display: grid;
     padding: 0.5rem;
     width: 80%;
-    grid-template-areas: 
+    grid-template-areas:
     "naam         prijs"
     "ingredienten prijs"
     "toevoegen    toevoegen";
     grid-template-columns: 1fr  auto;
     grid-template-rows:    auto 1fr;
-    background-color: #3B2417;
+    background-color: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 1rem;
 }
 
@@ -347,7 +346,8 @@ input[type="text"] {
     align-items: center;
     justify-content: center;
     height: calc(100vh - var(--header-height) - var(--nav-height));
-    background-color:antiquewhite;
+    background-color: var(--surface);
+    border-left: 1px solid var(--border);
 }
 
 .winkelmandje > header {
@@ -355,6 +355,7 @@ input[type="text"] {
     width: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
     flex-shrink: 0;
 }
 
@@ -390,8 +391,10 @@ input[type="text"] {
 .bestelling-regel {
     display: grid;
     margin: 1rem 5%;
+    padding: 0.5rem;
     grid-template-columns: 1fr auto 1fr;
-    background-color: #4C7A43;
+    background-color: var(--background);
+    border-radius: 0.5rem;
 }
 
 .winkelmandje-regel {
@@ -439,11 +442,13 @@ input[type="text"] {
 }
 
 .bestelling-met-status {
-    background-color: #4C7A43;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
     width: 50%;
     height: fit-content;
     border-radius: 1rem;
     margin: 3rem;
+    padding: 1rem;
 }
 
 .bestelling-met-status > header {
@@ -457,8 +462,23 @@ input[type="text"] {
 
 
 /* personeel/bezorger gedeelde functionaliteit */
+
+/* De pagina vult precies het scherm: alleen de kaartinhoud scrollt, nooit de pagina zelf. */
+.personeel-pagina,
+.bezorger-pagina {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.personeel-overzicht {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
 .logout-knop {
     margin-left: auto;
+    margin-right: 1%;
 }
 
 .column-card-container {
@@ -467,7 +487,8 @@ input[type="text"] {
     align-items: stretch;
     gap: 0.2rem;
     overflow-x: auto;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
 }
 
 .bestelling-card {
@@ -476,8 +497,7 @@ input[type="text"] {
     flex-shrink: 0;
     margin: 0.2rem;
     width: 280px;
-    max-height: 100%;
-    overflow-y: auto;
+    overflow: hidden;
     background-color: var(--surface);
     border-radius: 0.1rem;
 }
@@ -522,10 +542,20 @@ input[type="text"] {
 .order-details {
     padding: 0.5rem;
     flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .ingredienten {
     justify-self: end;
+}
+
+/* In een bestelregel staan de ingredienten op een eigen rij onder de productnaam. */
+.bestelling-regel .ingredienten {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin: 0.25rem 0 0;
+    padding-left: 1.2rem;
 }
 
 .klant-gegevens {

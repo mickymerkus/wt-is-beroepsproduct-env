@@ -1,4 +1,4 @@
-<main class="login-page">
+<main>
     <section class="login-card">
         <h2>Inloggen</h2>
         <img class="login-logo" src="./images/logo.png" alt="pizzeria logo">

@@ -50,6 +50,7 @@
     $paginaTitel = 'Keukenoverzicht';
     $bodyKlasse  = 'personeel-pagina';
     $toonBanner  = false;
+    $toonFooter  = false;
     $inhoud      = __DIR__ . '/presentatie/bestellingsoverzicht_personeel.php';
 
     include __DIR__ . '/presentatie/gedeeld/layout.php';

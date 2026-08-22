@@ -43,6 +43,7 @@
     $paginaTitel = 'Bezorgoverzicht';
     $bodyKlasse  = 'bezorger-pagina';
     $toonBanner  = false;
+    $toonFooter  = false;
     $inhoud      = __DIR__ . '/presentatie/bestellingsoverzicht_bezorger.php';
 
     include __DIR__ . '/presentatie/gedeeld/layout.php';

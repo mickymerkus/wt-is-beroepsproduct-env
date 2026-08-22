@@ -13,7 +13,7 @@
                     <li>
                         <a href="bevestig_bestelling.php">
                             Winkelmandje
-                            <?php if ($aantalInMandje > 0): ?>
+                            <?php if (($aantalInMandje ?? 0) > 0): ?>
                                 <span class="mandje-teller"><?= (int) $aantalInMandje ?></span>
                             <?php endif; ?>
                         </a>
@@ -25,17 +25,13 @@
                         <li><a href="registratie.php">Registreren</a></li>
                     <?php endif; ?>
                 <?php endif; ?>
-
-                <!-- Uitloggen en privacy gelden voor iedereen, ongeacht de rol -->
-                <?php if (isIngelogd()): ?>
-                    <li>
-                        <form action="uitloggen.php" method="post" class="uitlog-formulier">
-                            <button type="submit">Uitloggen</button>
-                        </form>
-                    </li>
-                <?php endif; ?>
-
-                <li><a href="privacy.php">Privacy</a></li>
             </ul>
         </nav>
+
+
+        <?php if (isIngelogd()): ?>
+            <form action="uitloggen.php" method="post" class="uitlog-formulier logout-knop">
+                <button type="submit">Uitloggen</button>
+            </form>
+        <?php endif; ?>
     </header>

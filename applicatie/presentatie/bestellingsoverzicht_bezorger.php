@@ -5,17 +5,19 @@
         <p>Er zijn op dit moment geen bestellingen die moeten worden bezorgd.</p>
     <?php endif; ?>
 
-    <section class="column-card-container">
+    <div class="column-card-container">
         <?php foreach ($bestellingen as $bestelling): ?>
             <article class="bestelling-card">
                 <header class="bestelling-card-header">
                     <div class="status-box <?= htmlspecialchars($bestelling['statusKlasse']) ?>">
                         <?= htmlspecialchars($bestelling['statusTekst']) ?>
                     </div>
-                    <p class="order-no">Bestelnummer: <?= (int) $bestelling['bestel_nummer'] ?></p>
+                    <h2 class="order-no">Bestelnummer: <?= (int) $bestelling['bestel_nummer'] ?></h2>
                 </header>
 
                 <section class="order-details">
+                    <h3>Bestelgegevens</h3>
+
                     <div class="klant-gegevens">
                         <p class="klant-naam"><?= htmlspecialchars($bestelling['klant_naam']) ?></p>
                         <p class="klant-adres"><?= htmlspecialchars($bestelling['adres'] ?? '') ?></p>
@@ -52,5 +54,5 @@
                 </footer>
             </article>
         <?php endforeach; ?>
-    </section>
+    </div>
 </main>
