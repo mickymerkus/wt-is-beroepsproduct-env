@@ -20,11 +20,14 @@
     // Afscherming van de parameter, default staat op de eerste waarde in de database
     $categorie = in_array($gevraagd, $categorieen, true) ? $gevraagd : $categorieen[0] ?? '';
 
+    // Of de lade na een redirect meteen open moet staan
+    $mandjeOpen = ($_GET['mandje'] ?? '') === 'open';
+
     // Toevoegen, wijzigen of verwijderen in het winkelmandje
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         verwerkWinkelmandjeActie($db, $_POST);
 
-        header('Location: index.php?categorie=' .urlencode($categorie));
+        header('Location: index.php?categorie=' . urlencode($categorie) . '&mandje=open');
         exit;
     }
 
@@ -40,6 +43,7 @@
     $toonBanner = true;
     $toonBestelknop = true;
     $winkelmandjeActie = 'index.php';
+    $mandjeAlsLade = true;      // menupagina: mandje schuift in en uit beeld
     $inhoud = __DIR__ . '/presentatie/menu.php';
 
     include __DIR__ . '/presentatie/gedeeld/layout.php';

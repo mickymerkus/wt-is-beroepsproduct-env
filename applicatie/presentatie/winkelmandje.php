@@ -1,5 +1,9 @@
-<aside class="winkelmandje">
+<aside class="winkelmandje<?= !empty($mandjeAlsLade) ? " winkelmandje-lade" : "" ?>">
     <header>
+        <?php if (!empty($mandjeAlsLade)): ?>
+            <label class="mandje-sluiten" for="mandje-toggle" aria-label="Winkelmandje sluiten">&times;</label>
+        <?php endif; ?>
+
         <img src="./images/receipt-img.png" alt="Het pizzeria logo op de bon, een kat die een pizza presenteert met een moerbout op de achtergrond.">
         <h2>Je bestelling</h2>
     </header>

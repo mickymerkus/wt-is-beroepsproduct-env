@@ -51,6 +51,7 @@
     $toonBanner = true;
     $toonBestelknop = false;
     $winkelmandjeActie = 'bevestig_bestelling.php';
+    $mandjeAlsLade = false;     // altijd zichtbaar op de bevestigpagina
     $categorie = ''; // geen categorietabs op deze pagina
     $inhoud = __DIR__ . '/presentatie/bestelformulier.php';
 

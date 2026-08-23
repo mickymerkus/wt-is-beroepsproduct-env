@@ -15,10 +15,17 @@
 
     --header-height: 70px;
     --nav-height: 40px;
+    --lade-breedte: min(90vw, 22rem);
+
+    /* Stapelvolgorde van de pagina.*/
+    --laag-inhoud: 10;
+    --laag-balk: 20;
+    --laag-header: 30;
 }
 
 /* Generale elementen */
 body > header {
+    z-index: var(--laag-header);
     height: var(--header-height);
     display: flex;
     flex-shrink: 0; /*dont go smaller than set size*/
@@ -94,6 +101,8 @@ main {
 }
 
 body > footer {
+    position: relative;     
+    z-index: var(--laag-inhoud);
     min-height: 10vh;
     flex-shrink: 0; /*dont go smaller than set size*/
     display: flex;
@@ -226,21 +235,17 @@ input[type="password"] {
 
 
 /* Home page */
-.home {
-    --product-winkelmandje-kolommen: 3fr 1fr;
-}
-
-
 .home main {
     display: grid;
-    grid-template-areas: "producten winkelmandje";
-    grid-template-columns: var(--product-winkelmandje-kolommen);
+    grid-template-areas: "producten";
+    grid-template-columns: 1fr;
 }
 
 .product-tabs {
+    z-index: var(--laag-balk);
     display: grid;
-    grid-template-columns: var(--product-winkelmandje-kolommen);
-    grid-column: 1; /*alleen boven de producten */
+    grid-template-columns: 1fr auto;   /* links de tabs, rechts de schakelaar */
+    align-items: center;
     height: var(--nav-height);
     background-color: var(--dark);
     position: sticky;
@@ -271,6 +276,8 @@ input[type="password"] {
 }
 
 .banner {
+    position: relative;                 /* z-index werkt alleen op gepositioneerde elementen */
+    z-index: var(--laag-inhoud);
     height: 50vh;
     background-color: var(--dark);
 }
@@ -288,6 +295,10 @@ input[type="password"] {
     align-content: start;
     gap: 1rem;
     padding: 1rem 0;
+    /* Ruimte voor de lade reserveren, zodat kaarten er nooit onder verdwijnen
+       als hij openstaat. Alleen op brede schermen: op smal scherm is de lade
+       zelf al bijna schermbreed, dus daar overlapt hij bewust wel. */
+    padding-right: var(--lade-breedte);
 }
 
 .product-card {
@@ -572,3 +583,102 @@ input[type="password"] {
 
 
 /* bestellingsoverzicht_personeel */
+
+
+
+.mandje-toggle-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.mandje-schakelaar {
+    justify-self: end;
+    margin-right: 1rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 1rem;
+    background-color: var(--primary);
+    color: var(--background);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.mandje-schakelaar:hover {
+    background-color: var(--primary-hover);
+}
+
+.mandje-sluiten {
+    align-self: flex-end;
+    margin: 0.5rem 1rem 0 0;
+    color: var(--text);
+    font-size: 1.5rem;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.winkelmandje-lade {
+    position: sticky;
+    top: calc(var(--header-height) + var(--nav-height));
+    grid-area: producten;
+    justify-self: end;
+    width: var(--lade-breedte);
+    height: calc(100vh - var(--header-height) - var(--nav-height));
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.3s ease-out, visibility 0.3s;
+}
+
+/* :has() leest de status van de verborgen checkbox terug - zelfde soort
+   truc als .formulier-sectie:has(#ideal:checked) hierboven. */
+body:has(#mandje-toggle:checked) .winkelmandje-lade {
+    transform: translateX(0);
+    visibility: visible;
+}
+
+
+/* ==========================================================================
+   Smallere schermen
+   ========================================================================== */
+
+@media (max-width: 900px) {
+    /* Op de bevestigpagina onder elkaar in plaats van naast elkaar. */
+    .bevestig-bestelling main {
+        grid-template-areas:
+            "bestelformulier"
+            "winkelmandje";
+        grid-template-columns: 1fr;
+    }
+
+    .bevestig-bestelling .winkelmandje {
+        height: 70vh;
+        border-left: none;
+        border-top: 1px solid var(--border);
+    }
+
+    .bevestig-bestelling .formulier form {
+        width: 90%;
+    }
+
+    /* De tabs staan op brede schermen ver uit elkaar; dat past hier niet meer. */
+    .product-tabs ul {
+        gap: 1rem;
+    }
+
+    .product-card {
+        width: 95%;
+    }
+
+    /* Op smal scherm dekt de lade toch al bijna het hele scherm als hij
+       openstaat, dus geen ruimte meer reserveren voor kaarten ernaast. */
+    .producten {
+        padding-right: 0;
+    }
+}
