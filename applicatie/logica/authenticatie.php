@@ -1,4 +1,13 @@
 <?php
+
+    // Beveiliging: dit bestand hoort alleen via een controller geladen te worden.
+    // Zonder die constante is het rechtstreeks in de browser opgevraagd; dan stopt
+    // het script voordat er iets wordt uitgevoerd of getoond.
+    if (!defined('TOEGANG_VIA_CONTROLLER')) {
+        http_response_code(403);
+        exit;
+    }
+
     require_once __DIR__ . '/../data/gebruikers.php';
     require_once __DIR__ . '/adres.php';
 
@@ -15,6 +24,14 @@
             return false;
         }
 
+        // Het rechtenniveau van deze sessie verandert nu van 'bezoeker' naar
+        // 'ingelogde gebruiker', dus krijgt de sessie een nieuw ID. Een ID dat
+        // een aanvaller vóór het inloggen in de browser had geplant (session
+        // fixation) is daarna waardeloos: het hoort niet meer bij deze sessie.
+        // true betekent dat de oude sessie meteen wordt verwijderd, zodat hij
+        // niet naast de nieuwe blijft bestaan.
+        session_regenerate_id(true);
+
         $_SESSION['gebruiker'] = [
             'username' => $gebruiker['username'],
             'voornaam' => $gebruiker['first_name'],
@@ -28,7 +45,14 @@
     // Log de gebruiker uit
     function logUitGebruiker(): void
     {
-        unset($_SESSION['gebruiker']);
+        // Alle sessiegegevens weggooien, niet alleen de sleutel 'gebruiker'.
+        // Anders blijft bijvoorbeeld het laatste bestelnummer achter en kan de
+        // volgende bezoeker op deze computer dat nog opvragen.
+        $_SESSION = [];
+
+        // Ook na het uitloggen een nieuw sessie-ID, zodat een ID dat iemand
+        // onderweg heeft opgevangen of geplant na de logout niets meer waard is.
+        session_regenerate_id(true);
     }
 
     // Check of de gebruiker is ingelogd
@@ -96,6 +120,11 @@
         $wachtwoordHash = password_hash($wachtwoord, PASSWORD_DEFAULT);
 
         maakGebruikerAan($verbinding, $username, $wachtwoordHash, $voornaam, $achternaam, $adres);
+
+        // Registreren logt meteen in, dus geldt hier hetzelfde als bij
+        // logInGebruiker(): het rechtenniveau van de sessie verandert, dus
+        // krijgt de sessie een nieuw ID.
+        session_regenerate_id(true);
 
         // Meteen inloggen na het aanmaken van het account
         $_SESSION['gebruiker'] = [

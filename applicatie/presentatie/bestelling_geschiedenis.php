@@ -1,3 +1,12 @@
+<?php
+// Beveiliging: dit bestand hoort alleen via een controller geladen te worden.
+// Zonder die constante is het rechtstreeks in de browser opgevraagd; dan stopt
+// het script voordat er iets wordt uitgevoerd of getoond.
+if (!defined('TOEGANG_VIA_CONTROLLER')) {
+    http_response_code(403);
+    exit;
+}
+?>
 <main class="bestelling-geschiedenis">
     <h1>Besteloverzicht</h1>
 
@@ -27,7 +36,7 @@
             <ul class="bestelling-regels">
                 <?php foreach ($bestelling['regels'] as $regel): ?>
                     <li class="bestelling-regel">
-                        <span class="aantal"><?= $regel['aantal'] ?>x</span>
+                        <span class="aantal"><?= (int) $regel['aantal'] ?>x</span>
                         <span class="naam-product"><?= htmlspecialchars($regel['product_naam']) ?></span>
                         <span class="prijs-product">&euro; <?= number_format($regel['regelTotaal'], 2, ',', '.') ?></span>
                     </li>

@@ -1,3 +1,12 @@
+<?php
+// Beveiliging: dit bestand hoort alleen via een controller geladen te worden.
+// Zonder die constante is het rechtstreeks in de browser opgevraagd; dan stopt
+// het script voordat er iets wordt uitgevoerd of getoond.
+if (!defined('TOEGANG_VIA_CONTROLLER')) {
+    http_response_code(403);
+    exit;
+}
+?>
     <header>
         <a href="index.php">
             <img class="header-logo" src="./images/icon.png" alt="Logo van pizzeria Sole Machina">

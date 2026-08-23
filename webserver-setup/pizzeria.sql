@@ -274,3 +274,80 @@ set @diff = DATEDIFF(minute, @middle_date, GETDATE());
 update Pizza_Order set [datetime] = DATEADD(minute, @diff, datetime);
 
 go
+
+
+-- ===========================================================================
+-- BEVEILIGING 1: zaadwachtwoorden hashen
+-- ---------------------------------------------------------------------------
+-- De meegeleverde zaadgegevens bewaren het wachtwoord als leesbare tekst.
+-- De applicatie vergelijkt met password_verify(), dat nooit overeenkomt met
+-- platte tekst, dus geen van deze accounts kon inloggen.
+--
+-- Deze UPDATE verandert niet WIE er bestaat of WAT het wachtwoord is: elk
+-- account logt nog steeds in met 'wachtwoord'. Alleen de OPSLAGVORM verandert,
+-- naar dezelfde bcrypt-hash die registratie.php met password_hash() aanmaakt.
+--
+-- De WHERE-voorwaarde begrenst de UPDATE tot rijen die nog platte tekst
+-- bevatten, zodat echte accounts die via het registratieformulier zijn
+-- aangemaakt nooit overschreven worden.
+--
+-- Alle zaadaccounts delen één hash omdat ze één wachtwoord delen. In een echt
+-- systeem heeft elk wachtwoord een eigen salt; dat gebeurt hier automatisch
+-- zodra een gebruiker zich registreert.
+-- ===========================================================================
+UPDATE [User]
+SET [password] = '$2y$12$7tVV3A9B52zom.nuHSNCY.oU90PBqLb3GV4ROr7dnCFYPjIm7qYfS'
+WHERE [password] = 'wachtwoord';
+
+go
+
+
+-- ===========================================================================
+-- BEVEILIGING 2: applicatielogin met minimale rechten
+-- ---------------------------------------------------------------------------
+-- De applicatie verbond als 'sa', de systeembeheerder van de hele SQL Server.
+-- Bij een geslaagde injectie zou een aanvaller daarmee elke database kunnen
+-- lezen, wijzigen en verwijderen.
+--
+-- 'pizzeria_web' krijgt uitsluitend de rechten die de applicatie aantoonbaar
+-- gebruikt: SELECT op de zeven tabellen, INSERT op de drie tabellen waarin de
+-- applicatie schrijft, en UPDATE op Pizza_Order voor de statuswijziging.
+-- Er wordt nergens in de broncode een DELETE uitgevoerd, dus dat recht wordt
+-- ook niet gegeven.
+--
+-- LET OP: dit wachtwoord moet gelijk zijn aan DB_APP_PASSWORD in variables.env.
+-- ===========================================================================
+IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = 'pizzeria_web')
+    CREATE LOGIN pizzeria_web
+        WITH PASSWORD = 'PizzaWeb-2026-SoleMachina',
+             CHECK_POLICY = OFF;
+
+go
+
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'pizzeria_web')
+    CREATE USER pizzeria_web FOR LOGIN pizzeria_web;
+
+go
+
+-- Lezen: alles wat de applicatie toont
+GRANT SELECT ON [User]                TO pizzeria_web;
+GRANT SELECT ON [ProductType]         TO pizzeria_web;
+GRANT SELECT ON [Product]             TO pizzeria_web;
+GRANT SELECT ON [Ingredient]          TO pizzeria_web;
+GRANT SELECT ON [Product_Ingredient]  TO pizzeria_web;
+GRANT SELECT ON [Pizza_Order]         TO pizzeria_web;
+GRANT SELECT ON [Pizza_Order_Product] TO pizzeria_web;
+
+-- Schrijven: alleen waar de applicatie daadwerkelijk schrijft
+GRANT INSERT ON [User]                TO pizzeria_web;  -- registratie.php
+GRANT INSERT ON [Pizza_Order]         TO pizzeria_web;  -- bestelling plaatsen
+GRANT INSERT ON [Pizza_Order_Product] TO pizzeria_web;  -- bestelregels
+GRANT UPDATE ON [Pizza_Order]         TO pizzeria_web;  -- statuswijziging personeel
+
+go
+
+-- Verberg de namen van databases waar deze login niets te zoeken heeft.
+USE master;
+DENY VIEW ANY DATABASE TO pizzeria_web;
+
+go
