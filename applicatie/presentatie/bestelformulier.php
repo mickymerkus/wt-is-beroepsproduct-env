@@ -1,7 +1,5 @@
 <main>
     <section class="formulier">
-        <a href="index.php">Terug naar Homepage.</a>
-
         <!-- Geef de mogelijke foutmeldingen weer -->
         <?php if ($fouten): ?>
             <ul class="foutmeldingen">

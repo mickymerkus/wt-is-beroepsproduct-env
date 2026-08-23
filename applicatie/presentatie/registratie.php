@@ -9,7 +9,6 @@
     <?php endif; ?>
 
     <section class="formulier">
-        <a href="index.php">Terug naar Homepage.</a>
         <form action="registratie.php" method="post">
 
             <fieldset class="formulier-sectie">
