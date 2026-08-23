@@ -1,12 +1,15 @@
 <?php
 
-// defined in 'variables.env'
-$db_host = 'database_server'; // de database server 
-$db_name = 'pizzeria';                    // naam van database
+// Alle waarden komen uit 'variables.env' (zie env_file in docker-compose.yml).
+$db_host     = getenv('DB_HOST');
+$db_name     = getenv('DB_NAME');
+$db_user     = getenv('APP_DB_USER');
+$db_password = getenv('APP_DB_PASSWORD');
 
-
-$db_user    = 'sa';                 // db user
-$db_password = 'abc123!@#';  // wachtwoord db user
+// Liever hier stoppen dan verderop een onduidelijke verbindingsfout krijgen.
+if ($db_host === false || $db_name === false || $db_user === false || $db_password === false) {
+  throw new RuntimeException('Databaseconfiguratie ontbreekt in de omgevingsvariabelen.');
+}
 
 // Het 'ssl certificate' wordt altijd geaccepteerd (niet overnemen op productie, verder dan altijd "TrustServerCertificate=1"!!!)
 $verbinding = new PDO('sqlsrv:Server=' . $db_host . ';Database=' . $db_name . ';ConnectionPooling=0;TrustServerCertificate=1', $db_user, $db_password);

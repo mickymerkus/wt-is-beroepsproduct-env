@@ -274,3 +274,16 @@ set @diff = DATEDIFF(minute, @middle_date, GETDATE());
 update Pizza_Order set [datetime] = DATEADD(minute, @diff, datetime);
 
 go
+
+-- Applicatie-account. Naam en wachtwoord komen uit variables.env.
+-- De login leeft op serverniveau en blijft bestaan als deze database wordt weggegooid.
+IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = '$(APP_DB_USER)')
+    CREATE LOGIN [$(APP_DB_USER)] WITH PASSWORD = '$(APP_DB_PASSWORD)', CHECK_POLICY = ON;
+
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = '$(APP_DB_USER)')
+    CREATE USER [$(APP_DB_USER)] FOR LOGIN [$(APP_DB_USER)];
+
+-- Bewust geen DELETE en geen DDL: de applicatie gebruikt die niet.
+GRANT SELECT, INSERT, UPDATE ON SCHEMA::dbo TO [$(APP_DB_USER)];
+
+go
