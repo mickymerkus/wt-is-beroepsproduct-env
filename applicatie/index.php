@@ -28,16 +28,14 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         verwerkWinkelmandjeActie($db, $_POST);
 
-        // Het paginanummer gaat mee in de redirect, anders springt de klant na
-        // het toevoegen van een product terug naar pagina 1 van het menu.
+        // Paginanummer mee, anders springt het menu na toevoegen terug naar pagina 1
         header('Location: index.php?categorie=' . urlencode($categorie)
             . '&pagina=' . huidigePaginaNummer($_POST)
             . '&mandje=open');
         exit;
     }
 
-    // ophalen van de data. Het menu wordt per pagina opgehaald, zodat een lange
-    // kaart nooit in één query de hele Product-tabel langs hoeft.
+    // ophalen van de data, het menu per pagina
     $totaalProducten = telProductenInCategorie($db, $categorie);
     $paginering = bouwPaginering($_GET, $totaalProducten);
 
@@ -58,8 +56,7 @@
     $toonBestelknop = true;
     $winkelmandjeActie = 'index.php';
     $mandjeAlsLade = true;      // menupagina: mandje schuift in en uit beeld
-    // Voor de paginaknoppen onder het menu. De categorie gaat mee in de links,
-    // zodat je binnen dezelfde categorie blijft als je doorbladert.
+    // Voor de paginaknoppen; de categorie gaat mee zodat je erin blijft bij doorbladeren
     $pagineringBasisUrl = 'index.php';
     $pagineringExtra    = ['categorie' => $categorie];
     $inhoud = __DIR__ . '/presentatie/menu.php';

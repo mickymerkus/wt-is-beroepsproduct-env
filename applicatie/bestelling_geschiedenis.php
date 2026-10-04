@@ -18,9 +18,7 @@
     $paginering = null;
 
     if ($gebruiker) {
-        // Een ingelogde klant ziet de historie van zijn bestellingen. Die lijst
-        // groeit bij elke bestelling, dus we halen er maar één pagina van op.
-        // Eerst tellen, want zonder totaal weten we niet hoeveel pagina's er zijn.
+        // Een ingelogde klant ziet zijn historie, één pagina per keer
         $totaalBestellingen = telBestellingenVanKlant($db, $gebruiker['username']);
         $paginering = bouwPaginering($_GET, $totaalBestellingen);
 

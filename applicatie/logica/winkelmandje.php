@@ -77,9 +77,7 @@
             return [];
         }
 
-        // Vraag alleen de prijzen op van wat er daadwerkelijk in het mandje ligt,
-        // in plaats van de hele Product-tabel. De keys van het mandje zijn de
-        // productnamen.
+        // Alleen de prijzen van wat in het mandje ligt (de keys zijn productnamen)
         $prijzen = haalPrijzenVanProducten($verbinding, array_keys($winkelmandje));
 
         $regels = [];

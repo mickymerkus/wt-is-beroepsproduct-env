@@ -1,13 +1,6 @@
 <?php
-    // Paginaknoppen onder een overzicht.
-    //
-    // Verwacht:
-    //   $paginering         - array uit bouwPaginering()
-    //   $pagineringBasisUrl - bestandsnaam waar de links naartoe gaan
-    //   $pagineringExtra    - optioneel: parameters die mee moeten in de link
-    //                         (bijvoorbeeld de gekozen categorie)
-    //
-    // Bij één pagina heeft navigatie geen zin, dan tonen we niks.
+    // Paginaknoppen onder een overzicht. Verwacht $paginering (uit bouwPaginering()),
+    // $pagineringBasisUrl en optioneel $pagineringExtra (extra linkparameters).
 
     $extra = $pagineringExtra ?? [];
 

@@ -22,14 +22,12 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['actie'] ?? '') === 'status_wijzigen') {
         wijzigBestellingStatus($db, $_POST);
 
-        // Het paginanummer gaat mee terug, anders springt de medewerker na het
-        // opslaan van een status naar pagina 1.
+        // Paginanummer mee, anders springt het overzicht terug naar pagina 1
         header('Location: bestellingsoverzicht_personeel.php?pagina=' . huidigePaginaNummer($_POST));
         exit;
     }
 
-    // Haal de bestellingen en de inhoud ervan op die relevant zijn voor de keuken.
-    // De wachtrij kan op een drukke avond lang worden, dus één pagina per keer.
+    // Eén pagina bestellingen met inhoud die relevant zijn voor de keuken
     $totaalBestellingen = telBestellingenMetStatus($db, KEUKEN_VAN, KEUKEN_TOT);
     $paginering = bouwPaginering($_GET, $totaalBestellingen);
 
@@ -41,8 +39,7 @@
         $paginering['offset']
     );
 
-    // Verzamel de productnamen die op deze pagina voorkomen, zodat we alleen
-    // de ingrediënten van die producten opvragen in plaats van de hele tabel.
+    // Alleen de ingrediënten van producten op deze pagina opvragen
     $productNamenOpPagina = [];
 
     foreach ($bestellingen as $bestelling) {

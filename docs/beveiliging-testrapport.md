@@ -42,17 +42,18 @@ werken (geen crash, geen lege pagina, geen zichtbare foutmelding).
 | Applicatie stopt direct als de configuratie ontbreekt | `data/db_connectie.php:10-12` |
 | Wachtwoord wordt na verbinden uit het geheugen gehaald | `data/db_connectie.php:18` |
 | Databaseaccount met minimale rechten: alleen `SELECT`, `INSERT`, `UPDATE`; geen `DELETE` en geen DDL | `webserver-setup/pizzeria.sql:287` |
-| Wachtwoorden gehasht met bcrypt (`password_hash` / `password_verify`) | `logica/authenticatie.php:96` en `:14` |
+| Wachtwoorden gehasht met bcrypt (`password_hash` / `password_verify`) | `logica/authenticatie.php:99` en `:14` |
 | Rol staat vast op `'Client'` bij registratie; de rol komt niet uit het formulier | `data/gebruikers.php:58` |
 | Rolcontrole aan de serverkant op beide personeelspagina's | `bestellingsoverzicht_personeel.php:14`, `bestellingsoverzicht_bezorger.php:13` |
 | Sessiecookie met `HttpOnly` (niet leesbaar voor JavaScript) en `SameSite=Lax` | `logica/sessie.php:15-16` |
+| Nieuw sessie-id bij inloggen en registreren, oude sessie wordt verwijderd (tegen session fixation) | `logica/authenticatie.php:19` en `:104` |
 | Alle tekst uit de database door `htmlspecialchars()`; getallen door `(int)` of `number_format()` | hele map `applicatie/presentatie/` |
 | Categorie uit de URL getoetst aan de lijst uit de database (whitelist) | `index.php:22` |
 | Statuscode getoetst aan een vaste lijst voordat die de database in gaat | `logica/bestelling.php:177-193` |
-| Product moet in de database bestaan voordat het in het mandje mag | `logica/winkelmandje.php:131` |
+| Product moet in de database bestaan voordat het in het mandje mag | `logica/winkelmandje.php:129` |
 | Aantal per product afgetopt op 50 | `logica/winkelmandje.php:5` |
-| Bestelnummer komt uit de sessie, niet uit de URL (geen IDOR) | `bestelling_geschiedenis.php:35` |
-| POST-redirect-GET, zodat F5 geen tweede wijziging opslaat | `bestellingsoverzicht_personeel.php:22-27` |
+| Bestelnummer komt uit de sessie, niet uit de URL (geen IDOR) | `bestelling_geschiedenis.php:33` |
+| POST-redirect-GET, zodat F5 geen tweede wijziging opslaat | `bestellingsoverzicht_personeel.php:22-28` |
 | Uitloggen reageert alleen op POST | `uitloggen.php:7` |
 | Alle lijstquery's begrensd met paginering (zie §5) | `logica/paginatie.php` |
 
@@ -252,6 +253,28 @@ uitlevering over HTTPS hoort die vlag erbij.
 
 Dit voorkomt dat iemand je uitlogt met een `<img src="...uitloggen.php">`.
 
+**F3 — Nieuw sessie-id na inloggen (session fixation)**
+
+Uitgevoerd op 5 oktober 2026, na het oplossen van §4.3. Eerst een sessie
+opgehaald met een GET, daarna met diezelfde cookie het formulier verstuurd.
+
+| Stap | Sessie-id voor | Sessie-id na |
+|---|---|---|
+| Registreren (`regtest_28827`) | `be81e812306ae46f7d0c1055d0963ba8` | `0a11fb6f944f469a3b8beae85b9c7164` |
+| Inloggen (`regtest_28827`) | `dfc127307917121ced421a2d23aa117f` | `537c7ee331616154e46fca91570a7887` |
+
+Daarna `index.php` opgevraagd met beide id's van de inlogtest:
+
+| Verwacht | Resultaat |
+|---|---|
+| Nieuw id is ingelogd, oud id niet | **Geslaagd.** Met het nieuwe id staat de uitlogknop op de pagina, met het oude id niet. |
+
+Een sessie-id dat iemand vooraf kent, is na het inloggen dus waardeloos. De
+nieuwe cookie houdt `HttpOnly` en `SameSite=Lax`. Maatregel:
+`session_regenerate_id(true)` in `logica/authenticatie.php:19` (inloggen) en
+`:104` (registreren, omdat je daarna meteen bent ingelogd). Door `true` wordt de
+oude sessie op de server verwijderd en niet alleen het id vervangen.
+
 ### G. Databaserechten
 
 **G1 — Rechten van het applicatieaccount**
@@ -326,7 +349,7 @@ Als gast, zonder eigen bestelling, geprobeerd:
 | Geen enkele bestelling zichtbaar | **Geslaagd.** Alle vier: 0 bestellingen. |
 
 Maatregel: de pagina leest het bestelnummer uit `$_SESSION['laatsteBestelling']`
-en kijkt niet naar de URL (`bestelling_geschiedenis.php:35`). Een ingelogde klant
+en kijkt niet naar de URL (`bestelling_geschiedenis.php:33`). Een ingelogde klant
 krijgt alleen bestellingen waar zijn eigen gebruikersnaam in de `WHERE` staat.
 
 ### I. Beschikbaarheid
@@ -396,9 +419,9 @@ browser, maar de server heeft er zelf geen controle op. Een token per formulier
 zou dit in de applicatie zelf oplossen in plaats van het aan het cookiebeleid van
 de browser over te laten.
 
-**4.3 — Geen `session_regenerate_id()` bij inloggen**
+**4.3 — Geen `session_regenerate_id()` bij inloggen (opgelost)**
 
-Gemeten sessie-id voor en na inloggen:
+Gemeten sessie-id voor en na inloggen, op de oorspronkelijke testdatum:
 
 ```
 voor:  6969629d74b39a31bb80fc7a3ab59a87
@@ -408,6 +431,9 @@ na:    6969629d74b39a31bb80fc7a3ab59a87
 Het id verandert niet. Wie iemand vooraf een bekend sessie-id kan opdringen,
 heeft na het inloggen van die persoon een geldige sessie (session fixation). Eén
 regel `session_regenerate_id(true)` direct na een gelukte login lost dit op.
+
+**Opgelost op 5 oktober 2026.** `session_regenerate_id(true)` staat nu in
+`logInGebruiker()` en in `registreerGebruiker()`. Hertest: zie F3.
 
 **4.4 — Testaccounts in `pizzeria.sql` kunnen niet inloggen**
 
@@ -443,7 +469,7 @@ database. Voor de lokale Docker-omgeving is dat acceptabel, op productie niet.
 
 **4.8 — Testdata in de database**
 
-Voor deze tests zijn `testpersoneel`, `testklant1`, `hacker1` en een aantal
+Voor deze tests zijn `testpersoneel`, `testklant1`, `hacker1`, `regtest_28827` en een aantal
 bestellingen aangemaakt. Opruimen kan niet met het applicatieaccount, want dat
 heeft geen `DELETE`-recht (zie G2) — dat moet met het `sa`-account of door het
 Docker-volume opnieuw op te bouwen.
@@ -555,6 +581,13 @@ curl -s -i http://localhost:8080/bestellingsoverzicht_personeel.php | grep -i lo
 
 # cookie-instellingen (F1)
 curl -s -i http://localhost:8080/index.php | grep -i set-cookie
+
+# nieuw sessie-id na inloggen (F3): vergelijk PHPSESSID voor en na
+curl -s -c jar.txt -o /dev/null http://localhost:8080/login.php
+grep PHPSESSID jar.txt
+curl -s -b jar.txt -c jar.txt -o /dev/null --data-urlencode "gebruikersnaam=regtest_28827" \
+        --data-urlencode "wachtwoord=Test123!" http://localhost:8080/login.php
+grep PHPSESSID jar.txt
 
 # paginanummer manipuleren (I1)
 curl -s "http://localhost:8080/bestellingsoverzicht_personeel.php?pagina=99999"

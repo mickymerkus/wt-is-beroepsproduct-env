@@ -64,8 +64,7 @@
         ]);
     }
 
-    // Tel hoeveel bestellingen deze klant in totaal heeft.
-    // Nodig om te weten hoeveel pagina's het overzicht krijgt.
+    // Totaal aantal bestellingen van de klant, voor het aantal pagina's
     function telBestellingenVanKlant($verbinding, $klantGebruikersnaam): int
     {
         $sql = '
@@ -80,17 +79,8 @@
         return (int) $query->fetchColumn();
     }
 
-    // Haal één pagina bestellingen van één klant op, inclusief de producten.
-    //
-    // Let op de opbouw: de paginering zit in de CTE 'pagina' en werkt dus op
-    // BESTELLINGEN, niet op de rijen van de join. Dat is bewust. Zet je
-    // OFFSET/FETCH op het resultaat van de join, dan knipt de database midden in
-    // een bestelling: de eerste producten komen op pagina 1 en de rest op pagina 2.
-    // "10 per pagina" zou dan ook 10 productregels betekenen in plaats van
-    // 10 bestellingen.
-    //
-    // Eerst dus de order_id's van deze pagina bepalen, en pas daarna de regels
-    // erbij joinen. Daardoor is het aantal opgehaalde rijen altijd begrensd.
+    // Haal één pagina bestellingen van een klant op, inclusief de producten.
+    // De CTE pagineert op bestellingen i.p.v. op joinrijen, anders valt een bestelling over twee pagina's.
     function haalBestellingenVanKlant($verbinding, $klantGebruikersnaam, int $perPagina, int $offset): array
     {
         $sql = '
@@ -119,10 +109,7 @@
 
         $query = $verbinding->prepare($sql);
 
-        // OFFSET en FETCH NEXT moeten als getal gebonden worden. Met de gewone
-        // execute([...]) gaat alles als string naar de database en weigert SQL Server
-        // de query: "The number of rows provided for a TOP or FETCH clauses row count
-        // parameter must be an integer." Daarom hier bindValue met PDO::PARAM_INT.
+        // OFFSET/FETCH weigeren een string, en execute([...]) stuurt alles als string mee
         $query->bindValue(':gebruikersnaam_klant', $klantGebruikersnaam);
         $query->bindValue(':offset', $offset, PDO::PARAM_INT);
         $query->bindValue(':per_pagina', $perPagina, PDO::PARAM_INT);
@@ -190,8 +177,7 @@
         return array_values($bestellingen);
     }
 
-    // Tel hoeveel bestellingen er binnen dit statusbereik vallen.
-    // Nodig om te weten hoeveel pagina's het overzicht krijgt.
+    // Totaal aantal bestellingen binnen het statusbereik, voor het aantal pagina's
     function telBestellingenMetStatus($verbinding, $vanStatus, $totStatus): int
     {
         $sql = '
@@ -209,10 +195,7 @@
     // Haal één pagina bestellingen op binnen een statusbereik.
     // De keuken vraagt 1 t/m 4 op, de bezorger 5 t/m 6.
     // Afgeleverd en geannuleerd worden niet meegenomen, zodat alleen de to do bestellingen er zijn.
-    //
-    // Zelfde opbouw als haalBestellingenVanKlant: de CTE pagineert de bestellingen,
-    // daarna komen de regels erbij. De sortering in de CTE is gelijk aan die in de
-    // buitenste query, anders kan dezelfde bestelling op twee pagina's opduiken.
+    // Zelfde CTE als haalBestellingenVanKlant; de sortering moet in beide delen gelijk zijn.
     function haalBestellingenMetStatus($verbinding, $vanStatus, $totStatus, int $perPagina, int $offset): array
     {
         $sql = '
@@ -241,8 +224,7 @@
 
         $query = $verbinding->prepare($sql);
 
-        // Zie de uitleg bij haalBestellingenVanKlant: OFFSET en FETCH NEXT
-        // moeten expliciet als integer gebonden worden.
+        // Als integer binden, zie haalBestellingenVanKlant
         $query->bindValue(':van', $vanStatus, PDO::PARAM_INT);
         $query->bindValue(':tot', $totStatus, PDO::PARAM_INT);
         $query->bindValue(':offset', $offset, PDO::PARAM_INT);

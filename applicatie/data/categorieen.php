@@ -2,10 +2,7 @@
 
 require_once __DIR__ . '/db_connectie.php';
 
-// Bovengrens op het aantal categorietabs. De categorieën vormen de navigatie
-// bovenaan de pagina, dus ze moeten alle tegelijk in beeld passen; pagineren
-// heeft hier geen zin. Een TOP houdt de query toch begrensd, zodat een
-// uitgedijde ProductType-tabel de navigatie niet onbeperkt laat groeien.
+// Bovengrens op de categorietabs. Pagineren heeft geen zin voor navigatie, dus een TOP i.p.v. OFFSET.
 const MAX_CATEGORIEEN = 25;
 
 // Haal de legitieme categorieën op (begrensd op MAX_CATEGORIEEN)
@@ -18,7 +15,7 @@ function haalProductTypes($verbinding): array {
 
     $query = $verbinding->prepare($sql);
 
-    // TOP eist net als FETCH NEXT een echt getal, geen string.
+    // TOP eist net als FETCH NEXT een integer
     $query->bindValue(':maximum', MAX_CATEGORIEEN, PDO::PARAM_INT);
     $query->execute();
 

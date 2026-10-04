@@ -21,14 +21,12 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['actie'] ?? '') === 'status_wijzigen') {
         wijzigBestellingStatus($db, $_POST);
 
-        // Het paginanummer gaat mee terug, anders springt de bezorger na het
-        // opslaan van een status naar pagina 1.
+        // Paginanummer mee, anders springt het overzicht terug naar pagina 1
         header('Location: bestellingsoverzicht_bezorger.php?pagina=' . huidigePaginaNummer($_POST));
         exit;
     }
 
-    // Haal de bestellingen op die klaarstaan voor bezorging of al onderweg zijn.
-    // Ook hier één pagina per keer, zodat de lijst nooit onbeperkt groeit.
+    // Eén pagina bestellingen die klaarstaan voor bezorging of al onderweg zijn
     $totaalBestellingen = telBestellingenMetStatus($db, BEZORGER_VAN, BEZORGER_TOT);
     $paginering = bouwPaginering($_GET, $totaalBestellingen);
 

@@ -2,8 +2,7 @@
 
     require_once __DIR__ . '/db_connectie.php';
 
-    // Tel hoeveel producten er in een categorie zitten.
-    // Nodig om te weten hoeveel pagina's het menu krijgt.
+    // Totaal aantal producten in de categorie, voor het aantal pagina's
     function telProductenInCategorie($verbinding, $categorie): int
     {
         $sql = '
@@ -19,11 +18,7 @@
     }
 
     // Haal één pagina producten op van een bepaalde categorie (pizza, drank etc.)
-    //
-    // Zelfde reden voor de CTE als bij de bestellingen: door de LEFT JOIN op de
-    // ingrediënten levert één product meerdere rijen op. Pagineer je die rijen,
-    // dan valt een pizza met veel ingrediënten over twee pagina's uiteen.
-    // De CTE kiest daarom eerst de producten van deze pagina.
+    // De CTE pagineert op producten, anders valt een pizza met veel ingrediënten over twee pagina's.
     function haalProductenMetIngredienten($verbinding, $categorie, int $perPagina, int $offset): array
     {
         $sql = '
@@ -44,7 +39,7 @@
 
         $query = $verbinding->prepare($sql);
 
-        // OFFSET en FETCH NEXT eisen een integer, zie de uitleg in bestellingen.php.
+        // Als integer binden, zie bestellingen.php
         $query->bindValue(':categorie', $categorie);
         $query->bindValue(':offset', $offset, PDO::PARAM_INT);
         $query->bindValue(':per_pagina', $perPagina, PDO::PARAM_INT);
@@ -54,10 +49,8 @@
         return _groepeerOpProduct($data);
     }
 
-    // Bouw een lijst placeholders (:naam0, :naam1, ...) voor een IN-clausule.
-    // De waarden gaan nog steeds als parameter mee; alleen het AANTAL
-    // placeholders is dynamisch. Zo blijft de query een prepared statement en
-    // komt er nooit gebruikersinvoer in de SQL-string terecht.
+    // Placeholders (:naam0, :naam1, ...) voor een IN-clausule. Alleen het aantal is dynamisch,
+    // de waarden gaan als parameter mee, dus er komt geen invoer in de SQL-string.
     function _maakPlaceholders(array $waarden, string $prefix): array
     {
         $placeholders = [];
@@ -97,18 +90,10 @@
         return array_values($producten);
     }
 
-    // Haal de prijzen op van precies de producten die gevraagd worden.
-    //
-    // Deze functie wordt NIET gepagineerd en dat is bewust: het resultaat is een
-    // opzoeklijst (naam => prijs) die het winkelmandje compleet nodig heeft.
-    // Zou je hier een pagina van maken, dan verdwijnen producten stilletjes uit
-    // het mandje, want haalWinkelmandjeRegels gooit alles weg waarvan het de prijs
-    // niet kan vinden. In plaats van pagineren begrenzen we de query daarom op de
-    // namen die we echt nodig hebben: nooit meer rijen dan er producten in het
-    // mandje zitten, in plaats van de hele Product-tabel.
+    // Haal de prijzen op van precies de gevraagde producten (naam => prijs).
+    // Bewust niet gepagineerd: haalWinkelmandjeRegels gooit producten zonder prijs weg.
     function haalPrijzenVanProducten($verbinding, array $productNamen): array
     {
-        // Geen namen gevraagd? Dan hoeft de database niks te doen.
         if (!$productNamen) {
             return [];
         }
@@ -149,14 +134,8 @@
         return $query->fetchColumn() !== false;
     }
 
-    // Haal de ingrediënten op van precies de producten die gevraagd worden.
-    // Is nodig voor het bestellingsoverzicht anders moet er moeilijk
-    // gedaan worden met arrays.
-    //
-    // Ook deze is een opzoeklijst en wordt dus niet gepagineerd, maar begrensd:
-    // het keukenoverzicht vraagt alleen de producten op die op de huidige pagina
-    // met bestellingen staan. De hele Product_Ingredient-tabel ophalen is niet
-    // nodig en groeit mee met de kaart.
+    // Haal de ingrediënten op van precies de gevraagde producten, voor het bestellingsoverzicht.
+    // Net als de prijzen begrensd op naam in plaats van gepagineerd.
     function haalIngredientenPerProduct($verbinding, array $productNamen): array
     {
         if (!$productNamen) {
