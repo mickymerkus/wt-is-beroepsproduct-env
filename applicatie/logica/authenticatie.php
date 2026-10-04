@@ -15,6 +15,9 @@
             return false;
         }
 
+        // Nieuw sessie-ID bij inloggen, zodat een vooraf bekend ID niet meer werkt (session fixation)
+        session_regenerate_id(true);
+
         $_SESSION['gebruiker'] = [
             'username' => $gebruiker['username'],
             'voornaam' => $gebruiker['first_name'],
@@ -97,7 +100,9 @@
 
         maakGebruikerAan($verbinding, $username, $wachtwoordHash, $voornaam, $achternaam, $adres);
 
-        // Meteen inloggen na het aanmaken van het account
+        // Meteen inloggen na het aanmaken van het account, ook hier met een nieuw sessie-ID
+        session_regenerate_id(true);
+
         $_SESSION['gebruiker'] = [
             'username' => $username,
             'voornaam' => $voornaam,
