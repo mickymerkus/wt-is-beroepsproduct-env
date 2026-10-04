@@ -15,6 +15,8 @@
             <input type="hidden" name="actie" value="toevoegen">
             <input type="hidden" name="product" value="<?= htmlspecialchars($product['naam']) ?>">
             <input type="hidden" name="categorie" value="<?= htmlspecialchars($categorie) ?>">
+            <!-- Zodat we na het toevoegen op dezelfde menupagina terugkomen -->
+            <input type="hidden" name="pagina" value="<?= (int) ($paginering['pagina'] ?? 1) ?>">
 
             <label for="aantal-<?= $index ?>">Aantal</label>
             <input type="number" name="aantal" id="aantal-<?= $index ?>" value="1" min="1" max="<?= MAX_AANTAL ?>">

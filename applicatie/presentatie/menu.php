@@ -9,6 +9,8 @@
         <?php foreach ($producten as $index => $product): ?>
             <?php include __DIR__ . '/productkaart.php'; ?>
         <?php endforeach ?>
+
+        <?php include __DIR__ . '/gedeeld/paginatie.php'; ?>
     </section>
 
     <?php include __DIR__ . '/winkelmandje.php'; ?>

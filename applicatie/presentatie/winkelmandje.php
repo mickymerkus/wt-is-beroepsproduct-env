@@ -17,6 +17,8 @@
                     <form class="regel-formulier" action="<?= htmlspecialchars($winkelmandjeActie) ?>" method="post">
                         <input type="hidden" name="product" value="<?= htmlspecialchars($regel['naam']) ?>">
                         <input type="hidden" name="categorie" value="<?= htmlspecialchars($categorie ?? '') ?>">
+                        <!-- Zodat we na het wijzigen op dezelfde menupagina terugkomen -->
+                        <input type="hidden" name="pagina" value="<?= (int) ($paginering['pagina'] ?? 1) ?>">
 
                         <button class="knop-aantal" type="submit" name="actie" value="verlagen"
                                 aria-label="Eén <?= htmlspecialchars($regel['naam']) ?> minder">&minus;</button>

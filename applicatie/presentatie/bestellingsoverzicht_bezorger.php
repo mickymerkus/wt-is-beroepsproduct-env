@@ -39,6 +39,8 @@
                 <footer class="bestelling-card-footer">
                     <form action="bestellingsoverzicht_bezorger.php" method="post" class="status-formulier">
                         <input type="hidden" name="bestelling" value="<?= (int) $bestelling['bestel_nummer'] ?>">
+                        <!-- Zodat we na het opslaan op dezelfde pagina terugkomen -->
+                        <input type="hidden" name="pagina" value="<?= (int) ($paginering['pagina'] ?? 1) ?>">
 
                         <label for="status-<?= (int) $bestelling['bestel_nummer'] ?>">Status veranderen:</label>
                         <select name="status" id="status-<?= (int) $bestelling['bestel_nummer'] ?>">
@@ -55,4 +57,6 @@
             </article>
         <?php endforeach; ?>
     </div>
+
+    <?php include __DIR__ . '/gedeeld/paginatie.php'; ?>
 </main>

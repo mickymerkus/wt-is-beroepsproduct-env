@@ -4,6 +4,7 @@
     require_once __DIR__ . '/logica/sessie.php';
     require_once __DIR__ . '/logica/winkelmandje.php';
     require_once __DIR__ . '/logica/authenticatie.php';
+    require_once __DIR__ . '/logica/paginatie.php';
 
 
     // Sessie starten zodat de sessiecookie wordt meegestuurd.
@@ -27,12 +28,25 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         verwerkWinkelmandjeActie($db, $_POST);
 
-        header('Location: index.php?categorie=' . urlencode($categorie) . '&mandje=open');
+        // Het paginanummer gaat mee in de redirect, anders springt de klant na
+        // het toevoegen van een product terug naar pagina 1 van het menu.
+        header('Location: index.php?categorie=' . urlencode($categorie)
+            . '&pagina=' . huidigePaginaNummer($_POST)
+            . '&mandje=open');
         exit;
     }
 
-    // ophalen van de data
-    $producten = haalProductenMetIngredienten($db, $categorie);
+    // ophalen van de data. Het menu wordt per pagina opgehaald, zodat een lange
+    // kaart nooit in één query de hele Product-tabel langs hoeft.
+    $totaalProducten = telProductenInCategorie($db, $categorie);
+    $paginering = bouwPaginering($_GET, $totaalProducten);
+
+    $producten = haalProductenMetIngredienten(
+        $db,
+        $categorie,
+        $paginering['perPagina'],
+        $paginering['offset']
+    );
     $winkelmandjeRegels = haalWinkelmandjeRegels($db);
     $winkelmandjeTotaal = berekenTotaal($winkelmandjeRegels);
     $aantalInMandje = aantalArtikelenInMandje();
@@ -44,6 +58,10 @@
     $toonBestelknop = true;
     $winkelmandjeActie = 'index.php';
     $mandjeAlsLade = true;      // menupagina: mandje schuift in en uit beeld
+    // Voor de paginaknoppen onder het menu. De categorie gaat mee in de links,
+    // zodat je binnen dezelfde categorie blijft als je doorbladert.
+    $pagineringBasisUrl = 'index.php';
+    $pagineringExtra    = ['categorie' => $categorie];
     $inhoud = __DIR__ . '/presentatie/menu.php';
 
     include __DIR__ . '/presentatie/gedeeld/layout.php';

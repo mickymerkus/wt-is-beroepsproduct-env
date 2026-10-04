@@ -679,3 +679,74 @@ body:has(#mandje-toggle:checked) .winkelmandje-lade {
         padding-right: 0;
     }
 }
+
+/* Paginering
+   Knoppen onder de overzichten waarmee je door de pagina's heen bladert.
+   Wordt gebruikt door presentatie/gedeeld/paginatie.php, dus door het menu,
+   het besteloverzicht van de klant en de twee personeelsoverzichten. */
+.paginering {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem 0;
+}
+
+.paginering-nummers {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.paginering-knop,
+.paginering-nummer {
+    display: inline-block;
+
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+
+    color: var(--text);
+    background-color: var(--surface);
+    text-decoration: none;
+}
+
+.paginering-knop:hover,
+.paginering-nummer:hover {
+    color: var(--surface);
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+/* De pagina waar je nu op staat is geen link, dus ook geen hover-effect. */
+.paginering-nummer.actief {
+    color: var(--surface);
+    background-color: var(--primary);
+    border-color: var(--primary);
+    font-weight: bold;
+}
+
+/* Vorige/Volgende op de eerste en laatste pagina: wel zichtbaar, niet klikbaar. */
+.paginering-knop.uitgeschakeld {
+    color: var(--border);
+    background-color: var(--surface);
+    cursor: default;
+}
+
+.paginering-info {
+    /* Op een eigen regel, zodat de knoppen gecentreerd blijven staan. */
+    flex-basis: 100%;
+    margin: 0;
+
+    color: var(--dark);
+    font-size: 0.85rem;
+    text-align: center;
+}

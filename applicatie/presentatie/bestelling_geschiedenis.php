@@ -39,4 +39,6 @@
             </footer>
         </article>
     <?php endforeach; ?>
+
+    <?php include __DIR__ . '/gedeeld/paginatie.php'; ?>
 </main>

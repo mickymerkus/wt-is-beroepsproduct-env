@@ -5,6 +5,7 @@
     require_once __DIR__ . '/logica/winkelmandje.php';
     require_once __DIR__ . '/logica/authenticatie.php';
     require_once __DIR__ . '/logica/bestelling.php';
+    require_once __DIR__ . '/logica/paginatie.php';
 
     startSessie();
 
@@ -20,12 +21,24 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['actie'] ?? '') === 'status_wijzigen') {
         wijzigBestellingStatus($db, $_POST);
 
-        header('Location: bestellingsoverzicht_bezorger.php');
+        // Het paginanummer gaat mee terug, anders springt de bezorger na het
+        // opslaan van een status naar pagina 1.
+        header('Location: bestellingsoverzicht_bezorger.php?pagina=' . huidigePaginaNummer($_POST));
         exit;
     }
 
     // Haal de bestellingen op die klaarstaan voor bezorging of al onderweg zijn.
-    $bestellingen = haalBestellingenMetStatus($db, BEZORGER_VAN, BEZORGER_TOT);
+    // Ook hier één pagina per keer, zodat de lijst nooit onbeperkt groeit.
+    $totaalBestellingen = telBestellingenMetStatus($db, BEZORGER_VAN, BEZORGER_TOT);
+    $paginering = bouwPaginering($_GET, $totaalBestellingen);
+
+    $bestellingen = haalBestellingenMetStatus(
+        $db,
+        BEZORGER_VAN,
+        BEZORGER_TOT,
+        $paginering['perPagina'],
+        $paginering['offset']
+    );
 
     // Alles wat het template moet tonen alvast klaarzetten
     foreach ($bestellingen as $index => $bestelling) {
@@ -44,6 +57,8 @@
     $bodyKlasse  = 'bezorger-pagina';
     $toonBanner  = false;
     $toonFooter  = false;
+    // Voor de paginaknoppen onder het overzicht
+    $pagineringBasisUrl = 'bestellingsoverzicht_bezorger.php';
     $inhoud      = __DIR__ . '/presentatie/bestellingsoverzicht_bezorger.php';
 
     include __DIR__ . '/presentatie/gedeeld/layout.php';

@@ -6,6 +6,7 @@
     require_once __DIR__ . '/logica/winkelmandje.php';
     require_once __DIR__ . '/logica/authenticatie.php';
     require_once __DIR__ . '/logica/bestelling.php';
+    require_once __DIR__ . '/logica/paginatie.php';
 
     startSessie();
 
@@ -21,13 +22,36 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['actie'] ?? '') === 'status_wijzigen') {
         wijzigBestellingStatus($db, $_POST);
 
-        header('Location: bestellingsoverzicht_personeel.php');
+        // Het paginanummer gaat mee terug, anders springt de medewerker na het
+        // opslaan van een status naar pagina 1.
+        header('Location: bestellingsoverzicht_personeel.php?pagina=' . huidigePaginaNummer($_POST));
         exit;
     }
 
     // Haal de bestellingen en de inhoud ervan op die relevant zijn voor de keuken.
-    $bestellingen = haalBestellingenMetStatus($db, KEUKEN_VAN, KEUKEN_TOT);
-    $ingredientenPerProduct = haalIngredientenPerProduct($db);
+    // De wachtrij kan op een drukke avond lang worden, dus één pagina per keer.
+    $totaalBestellingen = telBestellingenMetStatus($db, KEUKEN_VAN, KEUKEN_TOT);
+    $paginering = bouwPaginering($_GET, $totaalBestellingen);
+
+    $bestellingen = haalBestellingenMetStatus(
+        $db,
+        KEUKEN_VAN,
+        KEUKEN_TOT,
+        $paginering['perPagina'],
+        $paginering['offset']
+    );
+
+    // Verzamel de productnamen die op deze pagina voorkomen, zodat we alleen
+    // de ingrediënten van die producten opvragen in plaats van de hele tabel.
+    $productNamenOpPagina = [];
+
+    foreach ($bestellingen as $bestelling) {
+        foreach ($bestelling['regels'] as $regel) {
+            $productNamenOpPagina[$regel['product_naam']] = true;
+        }
+    }
+
+    $ingredientenPerProduct = haalIngredientenPerProduct($db, array_keys($productNamenOpPagina));
 
     // Alles wat het template moet tonen alvast klaarzetten
     foreach ($bestellingen as $index => $bestelling) {
@@ -51,6 +75,8 @@
     $bodyKlasse  = 'personeel-pagina';
     $toonBanner  = false;
     $toonFooter  = false;
+    // Voor de paginaknoppen onder het overzicht
+    $pagineringBasisUrl = 'bestellingsoverzicht_personeel.php';
     $inhoud      = __DIR__ . '/presentatie/bestellingsoverzicht_personeel.php';
 
     include __DIR__ . '/presentatie/gedeeld/layout.php';
